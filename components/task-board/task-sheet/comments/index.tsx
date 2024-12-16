@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@iconify/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Check } from "lucide-react";
-import { type Task as TaskType } from "@/app/api/tasks/data";
-import { type Comment as CommentType } from "@/app/api/comments/data";
+import { Task as TaskType } from "@/types/task.types";
+import { Comment as CommentType } from "@/types/comment.types";
 
 const Comments = ({ className, comments, taskId }: {
   className?: string;

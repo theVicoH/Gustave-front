@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/tooltip";
 import Priority from "../common/priority";
 import AssignList from "../common/assign-list";
-import { type Task as TaskType } from "@/app/api/tasks/data";
+import { Task as TaskType } from "@/types/task.types";
 
 const SheetActions = ({ task, taskId }: {
   task: TaskType

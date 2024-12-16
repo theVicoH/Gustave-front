@@ -13,10 +13,9 @@ import { cn } from "@/lib/utils";
 import Attachments from "./attachments";
 import SheetActions from "./sheet-actions";
 import { X } from "lucide-react";
-import { type Board as BoardType } from "@/app/api/boards/data";
-import { type Task as TaskType } from "@/app/api/tasks/data";
-import { type SubTask as SubTaskType } from "@/app/api/tasks/data";
-import { type Comment as CommentType } from "@/app/api/comments/data";
+import { Task as TaskType } from "@/types/task.types";
+import { SubTask as SubTaskType } from "@/types/subtask.types";
+import { Comment as CommentType } from "@/types/comment.types";
 
 interface TaskSheetProps {
   open: boolean;
@@ -26,7 +25,14 @@ interface TaskSheetProps {
   subTasks: SubTaskType[];
   comments: CommentType[];
 }
-const TaskSheet = ({ open, onClose, taskId, task, subTasks, comments }: TaskSheetProps) => {
+const TaskSheet = ({
+  open,
+  onClose,
+  taskId,
+  task,
+  subTasks,
+  comments,
+}: TaskSheetProps) => {
   const [collapseSheet, setCollapseSheet] = useState(false);
   const toggleCollapse = () => setCollapseSheet(!collapseSheet);
   return (
@@ -40,10 +46,7 @@ const TaskSheet = ({ open, onClose, taskId, task, subTasks, comments }: TaskShee
         })}
       >
         <SheetHeader className="sm:flex-row justify-between gap-3 space-y-0 border-b border-default-200  px-2 xl:px-6 py-5">
-          <TaskSheetHeader
-
-            toggleCollapse={toggleCollapse}
-          />
+          <TaskSheetHeader toggleCollapse={toggleCollapse} />
         </SheetHeader>
         <div
           className={cn("grid grid-cols-1 xl:grid-cols-2", {

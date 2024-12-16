@@ -13,10 +13,10 @@ import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Plus } from "lucide-react";
 import Select from "react-select";
-import { addTaskAction } from "@/action/project-action";
+// import { addTaskAction } from "@/action/project-action";
 import { useForm } from "react-hook-form";
 import { cn } from "@/lib/utils";
-import { type Board as BoardType } from "@/app/api/boards/data";
+import { Board as BoardType } from "@/types/board.types";
 const options = [
   { value: "plan-2023", label: "Plan 2023" },
   { value: "plan-2024", label: "Plan 2024" },
@@ -33,7 +33,10 @@ const styles = {
 const schema = z.object({
   title: z.string().min(2, { message: "title lagbe re vai ." }),
 });
-const AddTask = ({ onClose, boardId }: {
+const AddTask = ({
+  onClose,
+  boardId,
+}: {
   onClose: () => void;
   boardId: BoardType["id"];
 }) => {
@@ -53,10 +56,10 @@ const AddTask = ({ onClose, boardId }: {
     data.boardId = boardId;
     var result;
 
-    startTransition(async () => {
-      result = await addTaskAction(data);
-      toast.success("Successfully added");
-    });
+    // startTransition(async () => {
+    //   result = await addTaskAction(data);
+    //   toast.success("Successfully added");
+    // });
 
     onClose();
     reset();

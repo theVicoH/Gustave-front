@@ -41,11 +41,10 @@ import {
 } from "@/components/ui/tooltip";
 import { getWords } from "@/lib/utils";
 
-import { deleteTaskAction, updateTaskAction } from "@/action/project-action";
+// import { deleteTaskAction, updateTaskAction } from "@/action/project-action";
 import AssignMembers from "./common/assign-members";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { cn } from "@/lib/utils";
-
 
 const prioritiesColorMap: { [key: string]: any } = {
   high: "red",
@@ -63,8 +62,8 @@ const tagsColorMap: { [key: string]: any } = {
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { type Board as BoardType } from "@/app/api/boards/data";
-import { type Task as TaskType } from "@/app/api/tasks/data";
+import { Board as BoardType } from "@/types/board.types";
+import { Task as TaskType } from "@/types/task.types";
 interface TaskProps {
   task: TaskType;
   onUpdateTask: (task: TaskType) => void;
@@ -95,7 +94,7 @@ const Task = ({ task, onUpdateTask, boards }: TaskProps) => {
       ...task,
       boardId: boardId,
     };
-    updateTaskAction(task.id, newData);
+    // updateTaskAction(task.id, newData);
   };
 
   const getBoardNameById = (boardId: BoardType["id"]) => {
@@ -104,7 +103,7 @@ const Task = ({ task, onUpdateTask, boards }: TaskProps) => {
   };
   // delete task
   const onAction = async (dltId: string) => {
-    await deleteTaskAction(dltId);
+    // await deleteTaskAction(dltId);
   };
   // dnd
   const {
@@ -210,7 +209,6 @@ const Task = ({ task, onUpdateTask, boards }: TaskProps) => {
               <Image
                 alt=""
                 src={image}
-
                 className=" rounded"
                 height={190}
                 width={277}
@@ -221,7 +219,6 @@ const Task = ({ task, onUpdateTask, boards }: TaskProps) => {
           <div className="flex flex-wrap items-center gap-1 mt-2">
             <Badge
               color={prioritiesColorMap[task.priority]}
-
               className="text-[10px] px-1 py-0 rounded leading-4 capitalize"
             >
               {priority}

@@ -3,10 +3,10 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 
-import { postCommentAction } from "@/action/project-action";
+// import { postCommentAction } from "@/action/project-action";
 import avatar from "@/public/images/avatar/avatar-7.jpg";
 import { SendHorizontal } from "lucide-react";
-import { type Task as TaskType } from "@/app/api/tasks/data";
+import { Task as TaskType } from "@/types/task.types";
 const CommentFooter = ({ taskId }: {
   taskId?: TaskType["id"];
 }) => {
@@ -31,7 +31,7 @@ const CommentFooter = ({ taskId }: {
     };
 
     try {
-      await postCommentAction(newMessage as any);
+      // await postCommentAction(newMessage as any);
       setMessage("");
     } catch (error) {
       console.log(error);

@@ -8,7 +8,7 @@ import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { useForm, Controller } from "react-hook-form";
 
-import { addBoardAction, editBoardAction } from "@/action/project-action";
+// import { addBoardAction, editBoardAction } from "@/action/project-action";
 import {
   Dialog,
   DialogContent,
@@ -16,12 +16,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogClose,
-
 } from "@/components/ui/dialog";
 
 import { X } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { type Board as BoardType } from "@/app/api/boards/data";
+import { Board as BoardType } from "@/types/board.types";
 const schema = z.object({
   name: z.string().min(2, { message: "Your email is invalid." }),
   status: z.string().optional(),
@@ -56,17 +55,16 @@ const CreateBoard = ({ open, onClose, board, boardId }: CreateBoardProps) => {
     };
     var result;
     if (board) {
-      startTransition(async () => {
-        result = await editBoardAction(boardId as any, updatedData as any);
-        toast.success("Successfully update");
-      });
+      // startTransition(async () => {
+      //   result = await editBoardAction(boardId as any, updatedData as any);
+      //   toast.success("Successfully update");
+      // });
     } else {
-      startTransition(async () => {
-        result = await addBoardAction(data);
-        toast.success("Successfully added");
-      });
+      // startTransition(async () => {
+      //   result = await addBoardAction(data);
+      //   toast.success("Successfully added");
+      // });
     }
-
 
     onClose();
     reset();
@@ -81,10 +79,7 @@ const CreateBoard = ({ open, onClose, board, boardId }: CreateBoardProps) => {
         <DialogHeader className="flex-row justify-between items-center py-0 ">
           <DialogTitle className="text-default-900">Create Board</DialogTitle>
           <DialogClose asChild>
-            <div
-
-              className="w-7 h-7 bg-transparent hover:bg-transparent cursor-pointer"
-            >
+            <div className="w-7 h-7 bg-transparent hover:bg-transparent cursor-pointer">
               <X className="w-5 h-5 text-default-900" />
             </div>
           </DialogClose>

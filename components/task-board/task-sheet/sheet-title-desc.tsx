@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Icon } from "@iconify/react";
-import { updateTaskAction } from "@/action/project-action";
+// import { updateTaskAction } from "@/action/project-action";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { type Task as TaskType } from "@/app/api/tasks/data";
+import { Task as TaskType } from "@/types/task.types";
 const schema = z.object({
   title: z.string().min(1, {
     message: "What is your task title? ???",
@@ -49,7 +49,7 @@ const SheetTitleDesc = ({ task, taskId }: {
       desc: data.desc,
     };
     try {
-      await updateTaskAction(taskId, newData);
+      // await updateTaskAction(taskId, newData);
 
     } catch (error) {
       console.log(error);

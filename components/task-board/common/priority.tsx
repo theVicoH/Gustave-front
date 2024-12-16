@@ -8,8 +8,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { updateTaskAction } from "@/action/project-action";
-import { type Task as TaskType } from "@/app/api/tasks/data";
+// import { updateTaskAction } from "@/action/project-action";
+import { Task as TaskType } from "@/types/task.types";
 const Priority = ({ task, taskId }: {
   task?: TaskType | any;
   taskId?: TaskType["id"];
@@ -25,7 +25,7 @@ const Priority = ({ task, taskId }: {
           priority: value,
         };
 
-        await updateTaskAction(taskId, newData);
+        // await updateTaskAction(taskId, newData);
       } catch (error) {
         console.log(error);
       }

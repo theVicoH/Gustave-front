@@ -168,7 +168,7 @@ const ModuleSidebar = ({ trans }: { trans: any }) => {
               <div
                 key={i}
                 onClick={() => toggleSubMenu(i)}
-                className=" mb-3 last:mb-0"
+                className="mb-3 last:mb-0"
               >
                 <SingleIconMenu
                   index={i}

@@ -11,30 +11,24 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  ChevronDown,
-  Plus,
-  Trash2,
-  Minus,
-} from "lucide-react";
-import { deleteBoardAction } from "@/action/project-action";
+import { ChevronDown, Plus, Trash2, Minus } from "lucide-react";
+// import { deleteBoardAction } from "@/action/project-action";
 import DeleteConfirmationDialog from "@/components/delete-confirmation-dialog";
 import { Icon } from "@iconify/react";
 import { cn } from "@/lib/utils";
-import { type Board as BoardType } from "@/app/api/boards/data";
+import { Board as BoardType } from "@/types/board.types";
 interface TaskListProps {
   board: BoardType;
   onEdit: (board: BoardType) => void;
-  length: number
+  length: number;
   children?: React.ReactNode;
   onAction?: (id: BoardType["id"]) => void;
-
 }
 const TaskList = ({ board, children, onEdit, length }: TaskListProps) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [show, setShow] = React.useState<boolean>(true);
   async function onAction(id: string) {
-    await deleteBoardAction(id);
+    // await deleteBoardAction(id);
   }
   const { name, status, id } = board;
   return (
@@ -61,9 +55,14 @@ const TaskList = ({ board, children, onEdit, length }: TaskListProps) => {
           )}
           onClick={() => setShow(!show)}
         >
-          <span className={cn("text-default-700 transition-transform duration-300", {
-            "-rotate-90": !show
-          })}>
+          <span
+            className={cn(
+              "text-default-700 transition-transform duration-300",
+              {
+                "-rotate-90": !show,
+              }
+            )}
+          >
             <ChevronDown className="w-4 h-4 " />
           </span>
 

@@ -10,11 +10,11 @@ import {
   CommandInput,
   CommandItem,
 } from "@/components/ui/command";
-import { updateTaskAction } from "@/action/project-action";
+// import { updateTaskAction } from "@/action/project-action";
 import { Input } from "@/components/ui/input";
 import { CustomPopover } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
-import { type Task as TaskType } from "@/app/api/tasks/data";
+import { Task as TaskType } from "@/types/task.types";
 
 const newtags = [
   {
@@ -80,11 +80,11 @@ const AssignTags = ({ task, taskId }: {
       tags: updatedValues,
     };
 
-    try {
-      await updateTaskAction(taskId, newVal);
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   await updateTaskAction(taskId, newVal);
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   const handleTagSubmission = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -103,13 +103,13 @@ const AssignTags = ({ task, taskId }: {
       tags: updatedValues,
     };
 
-    try {
-      await updateTaskAction(taskId, newVal);
-      closePopover();
-      setNewTagName("");
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   await updateTaskAction(taskId, newVal);
+    //   closePopover();
+    //   setNewTagName("");
+    // } catch (error) {
+    //   console.log(error);
+    // }
   };
 
   return (
@@ -190,7 +190,7 @@ const AssignTags = ({ task, taskId }: {
         ) : (
           <>
             <Command className="p-0">
-              <CommandInput placeholder="Search..." />
+              {/* <CommandInput placeholder="Search..." /> */}
               <CommandEmpty>No newtag found.</CommandEmpty>
               <CommandGroup>
                 {newtags.map((newtag) => (
