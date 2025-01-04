@@ -1,4 +1,3 @@
-
 import {
   Application,
   Chart,
@@ -44,18 +43,15 @@ import {
   Mail,
 } from "@/components/svg";
 
-
 export interface MenuItemProps {
   title: string;
   icon: any;
   href?: string;
   child?: MenuItemProps[];
   megaMenu?: MenuItemProps[];
-  multi_menu? : MenuItemProps[]
-  nested?: MenuItemProps[]
+  multi_menu?: MenuItemProps[];
+  nested?: MenuItemProps[];
   onClick: () => void;
-
-  
 }
 
 export const menusConfig = {
@@ -78,6 +74,11 @@ export const menusConfig = {
           title: "Project ",
           href: "/project",
           icon: ClipBoard,
+        },
+        {
+          title: "Chat Bot",
+          href: "/chat-bot",
+          icon: "heroicons:chat-bubble-left-right", // ou une autre icône
         },
       ],
     },
@@ -1014,7 +1015,7 @@ export const menusConfig = {
           },
         ],
       },
-      
+
       // {
       //   title: "Application",
       //   icon: Application,
@@ -1791,7 +1792,7 @@ export const menusConfig = {
       //     {
       //       title: "Re Chart",
       //       icon: PretentionChartLine,
-      //       nested: [
+      //       multi_menu: [
       //         {
       //           title: "Line",
       //           href: "/charts-rechart-line",
@@ -1840,9 +1841,9 @@ export const menusConfig = {
       //       ],
       //     },
       //     {
-      //       title: "chart js",
+      //       title: "Chart js",
       //       icon: PretentionChartLine2,
-      //       nested: [
+      //       multi_menu: [
       //         {
       //           title: "Bar",
       //           href: "/charts-chartjs-bar",
@@ -1901,9 +1902,9 @@ export const menusConfig = {
       //       ],
       //     },
       //     {
-      //       title: "unovis",
+      //       title: "Unovis",
       //       icon: PretentionChartLine,
-      //       nested: [
+      //       multi_menu: [
       //         {
       //           title: "Line",
       //           href: "/charts-unovis-line",
@@ -1945,7 +1946,7 @@ export const menusConfig = {
       //     {
       //       title: "Unovis Map",
       //       icon: Map,
-      //       nested: [
+      //       multi_menu: [
       //         {
       //           title: "Leaflet Map",
       //           href: "/map-unovis-leaflet",
@@ -1989,33 +1990,18 @@ export const menusConfig = {
       //   child: [
       //     {
       //       title: "Level 1.1",
-      //       icon: Building,
       //       href: "#",
       //     },
       //     {
       //       title: "Level 2",
-      //       icon: Building2,
-      //       nested: [
+      //       multi_menu: [
       //         {
-      //           title: "Level-2.1",
+      //           title: "Level 2.1",
       //           href: "#",
       //         },
       //         {
       //           title: "Level 2.2",
       //           href: "#",
-      //         },
-      //         {
-      //           title: "Level 3",
-      //           child: [
-      //             {
-      //               title: "Level 3.1",
-      //               href: "#",
-      //             },
-      //             {
-      //               title: "Level 3.2",
-      //               href: "#",
-      //             },
-      //           ],
       //         },
       //       ],
       //     },
@@ -2031,8 +2017,6 @@ export const menusConfig = {
       //   title: "Dashboard",
       //   icon: DashBoard,
       //   href: "/dashboard",
-       
-        
       //   child: [
       //     {
       //       title: "Analytics",
@@ -2080,13 +2064,11 @@ export const menusConfig = {
       //   icon: Calendar,
       //   href: "/calendar",
       // },
-
       // {
       //   title: "project",
       //   icon: ClipBoard,
       //   href: "/projects",
       // },
-
       // {
       //   isHeader: true,
       //   title: "Pages",
@@ -2221,7 +2203,6 @@ export const menusConfig = {
       //   title: "Utility",
       //   icon: Diamond,
       //   href: "#",
-        
       //   child: [
       //     {
       //       title: "Blank Page",
@@ -2241,7 +2222,6 @@ export const menusConfig = {
       //   title: "Invoice",
       //   icon: Files,
       //   href: "#",
-        
       //   child: [
       //     {
       //       title: "Create Invoice",
@@ -2257,12 +2237,10 @@ export const menusConfig = {
       //     },
       //   ],
       // },
-
       // {
       //   title: "Error",
       //   icon: Error,
       //   href: "#",
-        
       //   child: [
       //     {
       //       title: "Error 401",
@@ -2556,7 +2534,6 @@ export const menusConfig = {
       //       title: "input-group",
       //       href: "/input2",
       //     },
-
       //     {
       //       title: "input-mask",
       //       href: "/input-mask",
@@ -3009,7 +2986,6 @@ export const menusConfig = {
   },
 };
 
-
-export type ModernNavType = (typeof menusConfig.sidebarNav.modern)[number]
-export type ClassicNavType = (typeof menusConfig.sidebarNav.classic)[number]
-export type MainNavType = (typeof menusConfig.mainNav)[number]
+export type ModernNavType = (typeof menusConfig.sidebarNav.modern)[number];
+export type ClassicNavType = (typeof menusConfig.sidebarNav.classic)[number];
+export type MainNavType = (typeof menusConfig.mainNav)[number];

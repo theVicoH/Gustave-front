@@ -5,9 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-
-
-
 export const isLocationMatch = (
   targetLocation: any,
   locationName: any
@@ -91,7 +88,6 @@ export function hslToHex(hsl: string): string {
   return hslToRgb(h, s, l);
 }
 
-
 export const hexToRGB = (hex: string, alpha?: number): string => {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
@@ -130,8 +126,6 @@ export const formatDate = (date: string | number | Date): string => {
   return new Date(date).toLocaleDateString("en-US", options);
 };
 
-
-
 // random word
 export function getWords(inputString: string): string {
   // Remove spaces from the input string
@@ -140,7 +134,6 @@ export function getWords(inputString: string): string {
   // Extract the first three characters
   return stringWithoutSpaces.substring(0, 3);
 }
-
 
 // for path name
 export function getDynamicPath(pathname: any): any {
@@ -156,7 +149,6 @@ export function getDynamicPath(pathname: any): any {
 }
 
 // translate
-
 interface Translations {
   [key: string]: string;
 }
@@ -169,5 +161,24 @@ export const translate = (title: string, trans: Translations): string => {
   }
 
   return title;
+};
+
+// Chat Types et Utils
+export interface ChatMessage {
+  id: string;
+  content: string;
+  timestamp: string;
+  senderId: number;
+  replayMetadata: boolean;
+}
+
+export interface ChatUser {
+  id: number;
+  name: string;
+  avatar?: string;
+}
+
+export const generateMessageId = (): string => {
+  return `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 };
 
