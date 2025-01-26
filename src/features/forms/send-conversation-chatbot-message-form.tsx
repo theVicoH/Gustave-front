@@ -32,18 +32,9 @@ const SendConversationChatbotMessageForm: React.FC<SendConversationChatbotMessag
   });
 
   function onSubmit(values: z.infer<typeof FORM_SCHEMA>) {
-    mutate(
-      { 
-        message: values.message, 
-        chatbotId, 
-        conversationId 
-      },
-      {
-        onSuccess: () => {
-          FORM.reset();
-        }
-      }
-    );
+    const message = values.message;
+    FORM.reset();
+    mutate({ message, chatbotId, conversationId });
   }
 
   return (

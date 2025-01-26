@@ -1,3 +1,4 @@
+import ChatbotConversationMessagesFeed from "@/features/feeds/chatbot-conversation-messages-feed";
 import SendConversationChatbotMessageForm from "@/features/forms/send-conversation-chatbot-message-form";
 
 interface PageProps {
@@ -10,9 +11,8 @@ interface PageProps {
 const ConversationPage = async ({ params }: PageProps) => {
   const { chatbotId, conversationId } = await params;
   return (
-    <div>
-      chatbotId: {chatbotId}
-      conversationId: {conversationId}
+    <div className="pb-96">
+      <ChatbotConversationMessagesFeed chatbotId={chatbotId} conversationId={conversationId} />
       <SendConversationChatbotMessageForm chatbotId={Number(chatbotId)} conversationId={conversationId} />
     </div>
   )

@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import useCreateChatbot from "@/hooks/use-create-chatbot";
+import { useChatbotStore } from "@/stores/chatbot-store";
+import { useEffect } from "react";
 
 const FORM_SCHEMA = z.object({
   name: z.string().min(2).max(50),
@@ -20,6 +22,7 @@ const FORM_SCHEMA = z.object({
 
 const CreateChatbotForm = () => {
   const { mutate } = useCreateChatbot();
+  const chatbot = useChatbotStore((state) => state.chatbot);
 
   const FORM = useForm<z.infer<typeof FORM_SCHEMA>>({
     resolver: zodResolver(FORM_SCHEMA),
@@ -31,6 +34,8 @@ const CreateChatbotForm = () => {
   function onSubmit(values: z.infer<typeof FORM_SCHEMA>) {
     mutate({ name: values.name, status: "public" });
   }
+
+  useEffect(() => {console.log(chatbot)}, [chatbot]);
 
   return (
     <Form {...FORM}>

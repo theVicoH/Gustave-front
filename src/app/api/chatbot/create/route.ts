@@ -16,4 +16,4 @@ export async function POST(req: Request) {
   
   const data = await res.json() as CreateChatbotResponse;
   return Response.json(data);
- }
+}

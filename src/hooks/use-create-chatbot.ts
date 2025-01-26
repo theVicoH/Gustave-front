@@ -1,19 +1,19 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, UseMutationResult } from "@tanstack/react-query";
 import { CreateChatbotResponse, CreateChatBotBody } from "@/types/chatbot";
 import { useToast } from "@/hooks/use-toast";
 import { useChatbotStore } from "@/stores/chatbot-store";
-import { createChatbot } from "@/services/chatbot-service";
+import { postCreateChatbot } from "@/services/chatbot-service";
 
-const useCreateChatbot = () => {
+const useCreateChatbot = (): UseMutationResult<CreateChatbotResponse, Error, CreateChatBotBody> => {
   const { toast } = useToast();
   const setChatbot = useChatbotStore((state) => state.setChatbot);
+  
   return useMutation({
     mutationKey: ["chatbot", "create"],
-    mutationFn: (data: CreateChatBotBody) => createChatbot(data),
+    mutationFn: (data: CreateChatBotBody) => postCreateChatbot(data),
     onSuccess: (res: CreateChatbotResponse) => {
-      //TODO: REMOVE THIS
       setChatbot(res.data.attributes);
       toast({
         title: "Success",

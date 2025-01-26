@@ -22,9 +22,32 @@ export interface SendChatbotConversationMessageBody {
   conversationId: string;
 }
 
-export interface ChatbotMessageAttributes {
+export interface SendChatbotConversationMessageAttributes {
   content: string;
   total_tokens: number;
 }
 
-export type ChatbotMessageResponse = Response<ChatbotMessageAttributes, []>;
+export type SendChatbotConversationMessageResponse = Response<
+  SendChatbotConversationMessageAttributes,
+  []
+>;
+
+export interface ChatbotConversationAllMessagesParams {
+  chatbotId: string;
+  conversationId: string;
+}
+
+export interface ChatbotConversationAllMessagesAttributes {
+  user_message: string;
+  assistant_message: string;
+  total_token: number;
+  conversation_id: string;
+  chatbot_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export type ChatbotConversationAllMessagesResponse = Response<
+  ChatbotConversationAllMessagesAttributes,
+  []
+>;
