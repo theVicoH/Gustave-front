@@ -1,5 +1,7 @@
+import { CreateChatBotBody, CreateChatbotResponse } from "@/types/chatbot";
+
 export async function POST(req: Request) {
-  const body = await req.json();
+  const body = await req.json() as CreateChatBotBody;
   
   const res = await fetch(`${process.env.API_URL}/create/chatbot`, {
     method: 'POST',
@@ -8,9 +10,10 @@ export async function POST(req: Request) {
     },
     body: JSON.stringify({
       name: body.name,
-      status: "public"
+      status: body.status
     })
   });
- 
-  return Response.json(await res.json());
+  
+  const data = await res.json() as CreateChatbotResponse;
+  return Response.json(data);
  }

@@ -1,15 +1,14 @@
-"use client"
+"use client";
 
-import { ChatbotAttributes } from '@/types/chatbot';
-import { create } from 'zustand'
+import { CreateChatbotAttributes } from "@/types/chatbot";
+import { create } from "zustand";
 
 interface ChatbotStore {
-  chatbot: ChatbotAttributes | null;
-  setChatbot: (chatbot: ChatbotAttributes) => void;
+  chatbot: CreateChatbotAttributes | null;
+  setChatbot: (chatbot: CreateChatbotAttributes) => void;
 }
- 
 
 export const useChatbotStore = create<ChatbotStore>((set) => ({
   chatbot: null,
-  setChatbot: (chatbot) => set({ chatbot })
+  setChatbot: (chatbot) => set({ chatbot }),
 }));

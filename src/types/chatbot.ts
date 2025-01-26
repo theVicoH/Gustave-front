@@ -5,13 +5,26 @@ export interface CreateChatBotBody {
   status: Status;
 }
 
-export interface ChatbotAttributes {
+export interface CreateChatbotAttributes {
   id: number;
   name: string;
   active: boolean;
   status: Status;
   created_at: string;
   updated_at: string;
- }
+}
 
- export type ChatbotResponse = Response<ChatbotAttributes, []>
+export type CreateChatbotResponse = Response<CreateChatbotAttributes, []>;
+
+export interface SendChatbotConversationMessageBody {
+  message: string;
+  chatbotId: number;
+  conversationId: string;
+}
+
+export interface ChatbotMessageAttributes {
+  content: string;
+  total_tokens: number;
+}
+
+export type ChatbotMessageResponse = Response<ChatbotMessageAttributes, []>;
