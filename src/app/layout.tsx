@@ -1,4 +1,6 @@
 import "@/app/globals.css";
+import { Toaster } from "@/components/ui/toaster";
+import ReactQueryProvider from "@/providers/react-query-provider";
 
 export default function RootLayout({
   children,
@@ -8,7 +10,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-background font-sans antialiased">
-        {children}
+        <ReactQueryProvider>
+          {children}
+          <Toaster />
+        </ReactQueryProvider>
       </body>
     </html>
   );
