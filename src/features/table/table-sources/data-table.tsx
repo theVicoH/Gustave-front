@@ -25,18 +25,24 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { DataTablePagination } from "@/features/table/table-sources/data-table-pagination";
-import { DataTableToolbar } from "@/features/table/table-sources/data-table-toolbar";
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
 import { File } from "@/data/schema";
-import { FileUpload } from "../../../components/file-upload";
+import { FileUpload } from "@/components/file-upload";
 
 interface DataTableProps {
   columns: ColumnDef<File>[];
   data: File[];
   onUpload: (files: File[]) => void;
+  isLoading: boolean;
 }
 
-export function DataTable({ columns, data, onUpload }: DataTableProps) {
+export function DataTable({
+  columns,
+  data,
+  onUpload,
+  isLoading,
+}: DataTableProps) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -71,12 +77,8 @@ export function DataTable({ columns, data, onUpload }: DataTableProps) {
     onUpload(files);
   };
 
-  if (!data.length) {
-    return (
-      <div className="rounded-md border bg-white p-8">
-        <FileUpload onUpload={handleUpload} />
-      </div>
-    );
+  if (isLoading) {
+    return <div>Chargement...</div>;
   }
 
   return (
@@ -87,18 +89,16 @@ export function DataTable({ columns, data, onUpload }: DataTableProps) {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -121,11 +121,8 @@ export function DataTable({ columns, data, onUpload }: DataTableProps) {
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Aucun résultat.
+                <TableCell colSpan={columns.length} className="h-96">
+                  <FileUpload onUpload={onUpload} />
                 </TableCell>
               </TableRow>
             )}

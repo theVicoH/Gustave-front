@@ -55,9 +55,6 @@ export const columns: ColumnDef<File>[] = [
         </div>
       );
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
   },
   {
     accessorKey: "size",

@@ -3,6 +3,8 @@
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table } from "@tanstack/react-table";
 import React from "react";
+import { toast } from "react-hot-toast";
+import { useUploadFile } from "@/hooks/use-upload-file";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,12 +22,32 @@ export function DataTableToolbar<TData>({
   table,
   onUpload,
 }: DataTableToolbarProps<TData>) {
+  const { mutate: uploadFile } = useUploadFile("1");
   const isFiltered = table.getState().columnFilters.length > 0;
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && onUpload) {
-      onUpload(Array.from(event.target.files));
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files) {
+      try {
+        const files = Array.from(event.target.files);
+
+        for (const file of files) {
+          if (file.type !== "application/pdf") {
+            toast.error("Seuls les fichiers PDF sont autorisés");
+            event.target.value = "";
+            return;
+          }
+        }
+
+        for (const file of files) {
+          uploadFile(file);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+      event.target.value = "";
     }
   };
 
@@ -65,7 +87,7 @@ export function DataTableToolbar<TData>({
           className="hidden"
           multiple
           onChange={handleFileSelect}
-          accept=".pdf,.docx,.txt,.md,.tex"
+          accept=".pdf"
         />
         <Button
           variant="outline"
