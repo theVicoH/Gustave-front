@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import useChatbotConversationAllMessages from "@/hooks/use-chatbot-conversation-all-messages";
 import { useToast } from "@/hooks/use-toast";
@@ -11,11 +11,13 @@ interface ChatbotConversationMessagesFeedProps {
   conversationId: string;
 }
 
-const ChatbotConversationMessagesFeed: React.FC<ChatbotConversationMessagesFeedProps> = ({ 
-  chatbotId, 
-  conversationId
-}) => {
-  const { data, error, isLoading } = useChatbotConversationAllMessages({ chatbotId, conversationId });
+const ChatbotConversationMessagesFeed: React.FC<
+  ChatbotConversationMessagesFeedProps
+> = ({ chatbotId, conversationId }) => {
+  const { data, error, isLoading } = useChatbotConversationAllMessages({
+    chatbotId,
+    conversationId,
+  });
   const { toast } = useToast();
   const { messages, addMessage } = useConversationStore();
 
@@ -48,13 +50,12 @@ const ChatbotConversationMessagesFeed: React.FC<ChatbotConversationMessagesFeedP
   return (
     <div className="flex flex-col space-y-4 p-4">
       {messages.map((message, index) => (
-        <div 
-          key={index}
-          className="flex flex-col gap-4"
-        >
-          <div className={`p-4 rounded-lg ${
-            message.sender === "user" ? "bg-gray-100" : "bg-blue-100"
-          }`}>
+        <div key={index} className="flex flex-col gap-4">
+          <div
+            className={`p-4 rounded-lg ${
+              message.sender === "user" ? "bg-gray-100" : "bg-blue-100"
+            }`}
+          >
             <p className="font-medium">
               {message.sender === "user" ? "You" : "Gustave"}
             </p>
