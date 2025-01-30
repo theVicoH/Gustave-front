@@ -23,3 +23,27 @@ export const getSources = async (chatbotId: string): Promise<File[]> => {
     throw error;
   }
 };
+
+export const deleteFile = async (fileId: string) => {
+  try {
+    const response = await fetch(`/api/file/${fileId}`, {
+      method: "DELETE",
+    });
+
+    const data = await response.json();
+
+    // On vérifie si la réponse est un succès (200) ou si le fichier n'existe pas (404)
+    if (response.status === 200 || response.status === 404) {
+      return {
+        success: true,
+        message: "Le fichier a bien été supprimé",
+      };
+    }
+
+    // Pour les autres codes d'erreur (500, etc.)
+    throw new Error(data.message || "Le fichier n'a pas pu être supprimé");
+  } catch (error) {
+    console.error("Delete error:", error);
+    throw error;
+  }
+};

@@ -10,19 +10,22 @@ interface FileUploadProps {
 }
 
 export function FileUpload({ onUpload }: FileUploadProps) {
-  const { mutate: uploadFile } = useUploadFile("1");
+  const { mutate: uploadFile, isSuccess } = useUploadFile("3");
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       try {
         for (const file of acceptedFiles) {
-          uploadFile(file);
+          await uploadFile(file);
+        }
+        if (isSuccess) {
+          onUpload(acceptedFiles);
         }
       } catch (error) {
         console.error(error);
       }
     },
-    [uploadFile]
+    [uploadFile, onUpload, isSuccess]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -33,7 +36,7 @@ export function FileUpload({ onUpload }: FileUploadProps) {
   });
 
   return (
-    <div className="h-[100%] flex items-center justify-center p-6">
+    <div className="h-[800px] flex items-center justify-center p-6">
       <div
         {...getRootProps()}
         className="border border-dashed border-gray-300 rounded-lg w-full h-full flex flex-col items-center justify-center gap-4 hover:bg-gray-50/50 transition-colors cursor-pointer"

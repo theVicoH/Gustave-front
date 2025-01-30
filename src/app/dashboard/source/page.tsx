@@ -9,12 +9,12 @@ import { useSources } from "@/hooks/use-sources";
 import { useUploadFile } from "@/hooks/use-upload-file";
 
 export default function SourcePage() {
-  const { data, isLoading } = useSources("1");
-  const { mutate: uploadFile } = useUploadFile("1");
+  const { data, isLoading } = useSources("3");
+  const { mutate: uploadFile } = useUploadFile("3");
 
-  const handleAddFiles = (files: File[]) => {
+  const handleAddFiles = async (files: File[]) => {
     for (const file of files) {
-      uploadFile(file);
+      await uploadFile(file);
     }
   };
 

@@ -80,37 +80,6 @@ export const columns: ColumnDef<File>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Statut" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue("status") as "ready" | "processing" | "error";
-      return (
-        <div className="flex w-[100px] items-center">
-          <Badge
-            variant={
-              status === "ready"
-                ? "success"
-                : status === "processing"
-                ? "default"
-                : "destructive"
-            }
-          >
-            {status === "ready"
-              ? "Prêt"
-              : status === "processing"
-              ? "En cours"
-              : "Erreur"}
-          </Badge>
-        </div>
-      );
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },

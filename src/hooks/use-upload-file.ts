@@ -8,9 +8,8 @@ export function useUploadFile(chatbotId: string) {
   return useMutation({
     mutationFn: (file: File) => uploadFile(file),
     onSuccess: () => {
-      // Invalider le cache des sources pour forcer un rechargement
       queryClient.invalidateQueries({ queryKey: ["sources", chatbotId] });
-      toast.success("Fichier(s) téléchargé(s) avec succès!");
+      toast.success("Fichier téléchargé avec succès!");
     },
     onError: (error: Error) => {
       toast.error(error.message);

@@ -54,18 +54,18 @@ export function DataTable({
   const table = useReactTable({
     data,
     columns,
+    getCoreRowModel: getCoreRowModel(),
+    enableRowSelection: true,
     state: {
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
     },
-    enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -79,6 +79,16 @@ export function DataTable({
 
   if (isLoading) {
     return <div>Chargement...</div>;
+  }
+
+  if (!data.length) {
+    return (
+      <div className="rounded-md border">
+        <div className="h-[100%]">
+          <FileUpload onUpload={onUpload} />
+        </div>
+      </div>
+    );
   }
 
   return (
