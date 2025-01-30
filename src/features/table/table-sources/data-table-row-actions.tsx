@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Download, Trash, Eye } from "lucide-react";
+import { useDeleteFile } from "@/hooks/use-delete-file";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -20,6 +21,13 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const { mutate: deleteFile } = useDeleteFile("3");
+
+  const handleDelete = async () => {
+    const fileId = row.original.id;
+    await deleteFile(fileId);
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -36,15 +44,8 @@ export function DataTableRowActions<TData>({
           <Eye className="mr-2 h-4 w-4" />
           Aperçu
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => console.log("Télécharger", row)}>
-          <Download className="mr-2 h-4 w-4" />
-          Télécharger
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => console.log("Supprimer", row)}
-          className="text-red-600"
-        >
+        <DropdownMenuItem onClick={handleDelete} className="text-red-600">
           <Trash className="mr-2 h-4 w-4" />
           Supprimer
         </DropdownMenuItem>

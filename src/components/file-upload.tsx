@@ -3,25 +3,35 @@
 import { Upload } from "lucide-react";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { useUploadFile } from "@/hooks/use-upload-file";
 
 interface FileUploadProps {
   onUpload: (files: File[]) => void;
 }
 
 export function FileUpload({ onUpload }: FileUploadProps) {
+  const { mutate: uploadFile, isSuccess } = useUploadFile("3");
+
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      onUpload(acceptedFiles);
+    async (acceptedFiles: File[]) => {
+      try {
+        for (const file of acceptedFiles) {
+          await uploadFile(file);
+        }
+        if (isSuccess) {
+          onUpload(acceptedFiles);
+        }
+      } catch (error) {
+        console.error(error);
+      }
     },
-    [onUpload]
+    [uploadFile, onUpload, isSuccess]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
       "application/pdf": [".pdf"],
-      "application/msword": [".docx", ".doc"],
-      "text/plain": [".txt", ".md", ".tex"],
     },
   });
 
@@ -42,7 +52,7 @@ export function FileUpload({ onUpload }: FileUploadProps) {
               : "Glissez & déposez des fichiers ici, ou cliquez pour sélectionner"}
           </p>
           <p className="text-sm text-gray-500">
-            Nous supportons les fichiers .pdf, .docx, .txt, .md et .tex
+            Nous supportons uniquement les fichiers PDF
           </p>
         </div>
       </div>
