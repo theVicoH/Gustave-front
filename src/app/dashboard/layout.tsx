@@ -56,14 +56,6 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
           <SidebarMenu className="md:p-3 p-6">
-            <SidebarMenuButton asChild active={pathname === "/dashboard"}>
-              <Link href="/dashboard">
-                <div className="flex items-center flex-1">
-                  <LayoutDashboard className="h-5 w-5 mr-3" />
-                  Dashboard
-                </div>
-              </Link>
-            </SidebarMenuButton>
             <SidebarMenuButton
               asChild
               active={pathname === "/dashboard/source"}
