@@ -21,8 +21,6 @@ import {
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { useState } from "react";
 import { UserNav } from "@/components/user-nav";
 
 export default function DashboardLayout({
