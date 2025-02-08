@@ -23,12 +23,8 @@ export async function POST(req: Request) {
 
     const data =
       (await response.json()) as SendChatbotConversationMessageResponse;
-
-    return NextResponse.json(data);
+    return Response.json(data);
   } catch {
-    return NextResponse.json(
-      { error: "Failed to send message" },
-      { status: 500 }
-    );
+    return Response.json({ error: "Failed to send message" }, { status: 500 });
   }
 }

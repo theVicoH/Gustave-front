@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Eye,
+  FormInput,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,14 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
             </Button>
           </div>
           <SidebarMenu className="md:p-3 p-6">
+            <SidebarMenuButton asChild active={pathname === "/dashboard"}>
+              <Link href="/dashboard">
+                <div className="flex items-center flex-1">
+                  <LayoutDashboard className="h-5 w-5 mr-3" />
+                  Dashboard
+                </div>
+              </Link>
+            </SidebarMenuButton>
             <SidebarMenuButton
               asChild
               active={pathname === "/dashboard/source"}
@@ -89,16 +98,26 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 </div>
               </Link>
             </SidebarMenuButton>
+            <SidebarMenuButton asChild active={pathname === "/dashboard/form"}>
+              <Link href="/dashboard/form">
+                <div className="flex items-center flex-1">
+                  <FormInput className="h-5 w-5 mr-3" />
+                  Form
+                </div>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter className="mt-auto">
           <div className="p-4 bg-black rounded-lg mx-2 mb-2 text-white">
-            <h3 className="font-medium mb-1">Storage capacity</h3>
+            <h3 className="font-medium mb-1">Activez votre Gustave</h3>
             <p className="text-sm opacity-90 mb-4">
-              Out of your total storage on Premium Plan, you have used up 40%.
+              Votre chatbot n’est pas encore activé. Tant qu’il reste inactif,
+              il ne peut pas être publié ni utilisé. Activez Gustave maintenant
+              pour le rendre opérationnel !
             </p>
             <button className="text-sm flex items-center">
-              Upgrade Now
+              Activer mon Gustave
               <span className="ml-1">→</span>
             </button>
           </div>

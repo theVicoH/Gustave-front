@@ -1,20 +1,42 @@
 import { Status, Response } from "./types";
 
+export type ChatbotStatus = "public" | "privé";
+
 export interface CreateChatBotBody {
   name: string;
-  status: Status;
+  status: ChatbotStatus;
 }
 
 export interface CreateChatbotAttributes {
   id: number;
   name: string;
   active: boolean;
-  status: Status;
+  status: ChatbotStatus;
   created_at: string;
   updated_at: string;
 }
 
-export type CreateChatbotResponse = Response<CreateChatbotAttributes, []>;
+export interface Chatbot {
+  id: number;
+  name: string;
+  status: ChatbotStatus;
+  platform: string;
+  visibility: string;
+}
+
+export interface CreateChatbotResponse {
+  data: {
+    attributes: {
+      id: number;
+      name: string;
+      active: boolean;
+      status: string;
+      created_at: string;
+      updated_at: string;
+    };
+    relationships: any[];
+  };
+}
 
 export interface SendChatbotConversationMessageBody {
   message: string;
