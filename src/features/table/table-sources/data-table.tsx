@@ -29,6 +29,7 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { File } from "@/data/schema";
 import { FileUpload } from "@/components/file-upload";
+import { useChatbotStore } from "@/stores/chatbot-store";
 
 interface DataTableProps {
   columns: ColumnDef<File>[];
@@ -50,6 +51,7 @@ export function DataTable({
     []
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
 
   const table = useReactTable({
     data,
@@ -73,10 +75,6 @@ export function DataTable({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  const handleUpload = (files: File[]) => {
-    onUpload(files);
-  };
-
   if (isLoading) {
     return <div>Chargement...</div>;
   }
@@ -85,7 +83,7 @@ export function DataTable({
     return (
       <div className="rounded-md border">
         <div className="h-[100%]">
-          <FileUpload onUpload={onUpload} />
+          <FileUpload chatbotId={selectedChatbotId} onUpload={onUpload} />
         </div>
       </div>
     );
@@ -132,7 +130,10 @@ export function DataTable({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-96">
-                  <FileUpload onUpload={onUpload} />
+                  <FileUpload
+                    chatbotId={selectedChatbotId}
+                    onUpload={onUpload}
+                  />
                 </TableCell>
               </TableRow>
             )}

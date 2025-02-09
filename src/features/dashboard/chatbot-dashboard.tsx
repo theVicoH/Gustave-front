@@ -23,7 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useChatbotStore } from "@/stores/chatbot-store";
 import CreateChatbotForm from "@/features/forms/create-chatbot-form";
 import { useDeleteChatbot } from "@/hooks/use-delete-chatbot";
@@ -34,43 +34,56 @@ export function ChatbotDashboard() {
   const { data: chatbots = [], isLoading } = useGetAllChatbots();
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [selectedBot, setSelectedBot] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const queryClient = useQueryClient();
   const deleteChat = useDeleteChatbot();
+  const setSelectedChatbot = useChatbotStore(
+    (state) => state.setSelectedChatbot
+  );
+  const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
+
+  console.log("Current selectedChatbotId:", selectedChatbotId);
+
+  const handleCardClick = (botId: string) => {
+    console.log("Card clicked with botId:", botId);
+    setSelectedChatbot(selectedChatbotId === botId ? null : botId);
+  };
+
+  useEffect(() => {
+    console.log("selectedChatbotId changed to:", selectedChatbotId);
+  }, [selectedChatbotId]);
 
   const handleSuccess = () => {
     setIsCreating(false);
     setOpen(false);
     setIsEditing(false);
-    setSelectedBot(null);
     queryClient.invalidateQueries({ queryKey: ["chatbots"] });
   };
 
   const handleDeleteClick = (botId: number) => {
-    setSelectedBot(botId.toString());
+    setSelectedChatbot(botId.toString());
     setDeleteOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    if (selectedBot) {
-      deleteChat.mutate(selectedBot, {
+    if (selectedChatbotId) {
+      deleteChat.mutate(selectedChatbotId, {
         onSuccess: () => {
           setDeleteOpen(false);
-          setSelectedBot(null);
+          setSelectedChatbot(null);
           queryClient.invalidateQueries({ queryKey: ["chatbots"] });
         },
-        onError: (error) => {
+        onError: () => {
           setDeleteOpen(false);
-          setSelectedBot(null);
+          setSelectedChatbot(null);
         },
       });
     }
   };
 
   return (
-    <div className="h-full overflow-hidden p-6">
+    <div className="h-full overflow-hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
@@ -93,33 +106,21 @@ export function ChatbotDashboard() {
               </div>
             </div>
           </Card>
-
-          <Card className="p-3 bg-white border border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Settings className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">
-                  Sources
-                </p>
-                <h3 className="text-2xl font-bold">12</h3>
-              </div>
-            </div>
-          </Card>
         </div>
       </div>
 
       <div className="flex flex-col gap-6">
-        <div className="flex justify-end">
-          <Button
-            onClick={() => setOpen(true)}
-            className="bg-black text-white hover:bg-gray-800 transition-colors"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Create Chatbot
-          </Button>
-        </div>
+        {chatbots.length > 0 && (
+          <div className="flex justify-end">
+            <Button
+              onClick={() => setOpen(true)}
+              className="bg-black text-white hover:bg-gray-800 transition-colors"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Create Chatbot
+            </Button>
+          </div>
+        )}
 
         <div className="overflow-y-auto">
           {isLoading ? (
@@ -129,9 +130,14 @@ export function ChatbotDashboard() {
               {chatbots.map((bot) => (
                 <Card
                   key={bot.id}
-                  className="relative cursor-pointer transition-all duration-200 hover:shadow-lg border"
+                  className={`cursor-pointer transition-all duration-200 ${
+                    selectedChatbotId === bot.id.toString()
+                      ? "border-2 border-black shadow-lg"
+                      : "hover:border-gray-300"
+                  }`}
+                  onClick={() => handleCardClick(bot.id.toString())}
                 >
-                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <h3 className="font-semibold text-lg">{bot.name}</h3>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -143,7 +149,7 @@ export function ChatbotDashboard() {
                         <DropdownMenuItem
                           onClick={() => {
                             setIsEditing(true);
-                            setSelectedBot(bot.id.toString());
+                            setSelectedChatbot(bot.id.toString());
                             setOpen(true);
                           }}
                         >
@@ -165,7 +171,9 @@ export function ChatbotDashboard() {
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Crown className="mr-2 h-4 w-4" />
-                      <span>Active: {bot.active ? "Yes" : "No"}</span>
+                      <span>
+                        Abonnement: {bot.active ? "Actif" : "Non actif"}
+                      </span>
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Globe className="mr-2 h-4 w-4" />
@@ -209,7 +217,7 @@ export function ChatbotDashboard() {
             </DialogTitle>
           </DialogHeader>
           <CreateChatbotForm
-            chatbotId={selectedBot}
+            chatbotId={selectedChatbotId}
             isEditing={isEditing}
             onSuccess={handleSuccess}
             onSubmitStarted={() => setIsCreating(true)}

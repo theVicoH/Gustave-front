@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Download, Trash, Eye } from "lucide-react";
 import { useDeleteFile } from "@/hooks/use-delete-file";
+import { useChatbotStore } from "@/stores/chatbot-store";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -21,7 +22,8 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const { mutate: deleteFile } = useDeleteFile("3");
+  const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
+  const { mutate: deleteFile } = useDeleteFile(selectedChatbotId || "");
 
   const handleDelete = async () => {
     const fileId = row.original.id;

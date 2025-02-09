@@ -6,7 +6,7 @@ export function useUploadFile(chatbotId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (file: File) => uploadFile(file),
+    mutationFn: (file: File) => uploadFile(file, chatbotId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sources", chatbotId] });
       toast.success("Fichier téléchargé avec succès!");

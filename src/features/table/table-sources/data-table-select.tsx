@@ -2,13 +2,15 @@ import { Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Trash } from "lucide-react";
 import { useDeleteFile } from "@/hooks/use-delete-file";
+import { useChatbotStore } from "@/stores/chatbot-store";
 
 interface DataTableSelectProps<TData> {
   table: Table<TData>;
 }
 
 export function DataTableSelect<TData>({ table }: DataTableSelectProps<TData>) {
-  const { mutate: deleteFile } = useDeleteFile("3");
+  const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
+  const { mutate: deleteFile } = useDeleteFile(selectedChatbotId || "");
   const selectedRows = table.getSelectedRowModel().rows;
 
   const handleDeleteSelected = async () => {

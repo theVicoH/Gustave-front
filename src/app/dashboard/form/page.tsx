@@ -1,6 +1,18 @@
 "use client";
 
+import { useChatbotStore } from "@/stores/chatbot-store";
+
 export default function FormPage() {
+  const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
+
+  if (!selectedChatbotId) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <p className="text-gray-500">Veuillez sélectionner un chatbot</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

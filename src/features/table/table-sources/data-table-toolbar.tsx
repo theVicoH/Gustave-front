@@ -9,6 +9,7 @@ import { Table } from "@tanstack/react-table";
 import React from "react";
 import { toast } from "react-hot-toast";
 import { useUploadFile } from "@/hooks/use-upload-file";
+import { useChatbotStore } from "@/stores/chatbot-store";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +28,8 @@ export function DataTableToolbar<TData>({
   table,
   onUpload,
 }: DataTableToolbarProps<TData>) {
-  const { mutate: uploadFile } = useUploadFile("3");
+  const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
+  const { mutate: uploadFile } = useUploadFile(selectedChatbotId || "");
   const isFiltered = table.getState().columnFilters.length > 0;
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 

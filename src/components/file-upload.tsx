@@ -7,10 +7,11 @@ import { useUploadFile } from "@/hooks/use-upload-file";
 
 interface FileUploadProps {
   onUpload: (files: File[]) => void;
+  chatbotId: string;
 }
 
-export function FileUpload({ onUpload }: FileUploadProps) {
-  const { mutate: uploadFile, isSuccess } = useUploadFile("3");
+export function FileUpload({ onUpload, chatbotId }: FileUploadProps) {
+  const { mutate: uploadFile, isSuccess } = useUploadFile(chatbotId);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
