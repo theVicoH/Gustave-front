@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { FormInput } from "@/components/ui/form-input";
+import { login } from "@/services/auth-service";
 
 const loginSchema = z.object({
   email: z.string().email("Veuillez entrer une adresse email valide"),
@@ -20,6 +22,7 @@ type FormData = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
   const [isPending, setIsPending] = useState(false);
+  const router = useRouter();
 
   const form = useForm<FormData>({
     resolver: zodResolver(loginSchema),
@@ -32,10 +35,13 @@ export function LoginForm() {
   const onSubmit = async (data: FormData) => {
     setIsPending(true);
     try {
+      await login(data);
       toast.success("Connexion réussie !");
       form.reset();
-    } catch (error) {
-      toast.error("Une erreur est survenue");
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Erreur lors de la connexion:", error);
+      toast.error(error.message || "Erreur lors de la connexion");
     } finally {
       setIsPending(false);
     }
@@ -44,7 +50,7 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-[400px]">
       <CardHeader className="space-y-1">
-        <div className="text-2xl font-bold">Hey, Hello 👋</div>
+        <div className="text-2xl font-bold">Salut, Connecte toi 👋</div>
         <p className="text-sm text-muted-foreground">
           Entrez vos informations pour vous connecter
         </p>
@@ -68,14 +74,14 @@ export function LoginForm() {
             error={form.formState.errors.password?.message}
           />
 
-          <div className="flex justify-end">
+{/*           <div className="flex justify-end">
             <Link
               href="/auth/forgot-password"
               className="text-sm text-primary hover:underline"
             >
               Mot de passe oublié ?
             </Link>
-          </div>
+          </div> */}
 
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

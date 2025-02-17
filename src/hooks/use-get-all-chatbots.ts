@@ -10,7 +10,7 @@ export function useGetAllChatbots() {
     queryFn: async () => {
       const response = await getChatbots();
       // Transformer les données pour avoir la bonne structure
-      const chatbotsData = response.map((item: any) => ({
+      const chatbotsData = response.chatbots.map((item: any) => ({
         id: item.data.attributes.id,
         name: item.data.attributes.name,
         status: item.data.attributes.status,

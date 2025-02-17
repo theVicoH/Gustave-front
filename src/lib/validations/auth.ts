@@ -2,6 +2,9 @@ import * as z from "zod";
 
 export const registerSchema = z
   .object({
+    name: z.string().min(2, {
+      message: "Le nom doit contenir au moins 2 caractères",
+    }),
     email: z.string().email({
       message: "Veuillez entrer une adresse email valide.",
     }),
@@ -20,9 +23,6 @@ export const registerSchema = z
         message: "Le mot de passe doit contenir au moins un caractère spécial",
       }),
     confirmPassword: z.string(),
-    terms: z.boolean().refine((data) => data === true, {
-      message: "Vous devez accepter les conditions d'utilisation",
-    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Les mots de passe ne correspondent pas",

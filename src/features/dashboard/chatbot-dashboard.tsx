@@ -9,6 +9,7 @@ import {
   MoreVertical,
   Plus,
   Trash,
+  QrCode,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,6 +46,12 @@ export function ChatbotDashboard() {
 
   console.log("Current selectedChatbotId:", selectedChatbotId);
 
+  useEffect(() => {
+    if (!isLoading && chatbots.length > 0 && !selectedChatbotId) {
+      setSelectedChatbot(chatbots[0].id.toString());
+    }
+  }, [isLoading, selectedChatbotId, setSelectedChatbot]);
+
   const handleCardClick = (botId: string) => {
     console.log("Card clicked with botId:", botId);
     setSelectedChatbot(selectedChatbotId === botId ? null : botId);
@@ -58,7 +65,14 @@ export function ChatbotDashboard() {
     setIsCreating(false);
     setOpen(false);
     setIsEditing(false);
-    queryClient.invalidateQueries({ queryKey: ["chatbots"] });
+    queryClient.invalidateQueries({ queryKey: ["chatbots"] }).then(() => {
+      if (chatbots.length === 0) {
+        const newChatbots = queryClient.getQueryData(["chatbots"]) as any[];
+        if (newChatbots?.length === 1) {
+          setSelectedChatbot(newChatbots[0].id.toString());
+        }
+      }
+    });
   };
 
   const handleDeleteClick = (botId: number) => {
@@ -84,22 +98,32 @@ export function ChatbotDashboard() {
 
   return (
     <div className="h-full overflow-hidden">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8  mb-12">
+        <div className="space-y-2">
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-muted-foreground">
             Vue d'ensemble de votre chatbot
           </p>
         </div>
 
-        <div className="flex gap-4">
-          <Card className="p-3 bg-white border border-gray-200">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Bot className="h-5 w-5 text-primary" />
+        <div className="flex items-center gap-8">
+          {chatbots.length > 0 && (
+            <Button
+              onClick={() => setOpen(true)}
+              className="bg-black p-3 text-white hover:bg-gray-800 transition-colors px-6 py-2 h-12"
+            >
+              <Plus className="mr-3 h-5 w-5" />
+              Create Chatbot
+            </Button>
+          )}
+          <Card className="p-3 bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all">
+            <div className="flex items-center space-x-4">
+              <div className="p-3 bg-primary/10 rounded-lg">
+                <Bot className="h-6 w-6 text-primary" />
               </div>
+
               <div>
-                <p className="text-sm font-medium text-muted-foreground">
+                <p className="text-sm font-medium text-muted-foreground mb-1">
                   Chatbots
                 </p>
                 <h3 className="text-2xl font-bold">{chatbots.length}</h3>
@@ -109,101 +133,158 @@ export function ChatbotDashboard() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-6">
-        {chatbots.length > 0 && (
-          <div className="flex justify-end">
-            <Button
-              onClick={() => setOpen(true)}
-              className="bg-black text-white hover:bg-gray-800 transition-colors"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Create Chatbot
-            </Button>
-          </div>
-        )}
-
-        <div className="overflow-y-auto">
+      <div className="space-y-8 h-full justify-center">
+        <div className="overflow-y-auto justify-center ">
           {isLoading ? (
-            <div>Loading...</div>
+            <div className="flex justify-center items-center min-h-[300px]">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+            </div>
           ) : chatbots && chatbots.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {chatbots.map((bot) => (
-                <Card
-                  key={bot.id}
-                  className={`cursor-pointer transition-all duration-200 ${
-                    selectedChatbotId === bot.id.toString()
-                      ? "border-2 border-black shadow-lg"
-                      : "hover:border-gray-300"
-                  }`}
-                  onClick={() => handleCardClick(bot.id.toString())}
-                >
-                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <h3 className="font-semibold text-lg">{bot.name}</h3>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => {
-                            setIsEditing(true);
-                            setSelectedChatbot(bot.id.toString());
-                            setOpen(true);
-                          }}
+            <div className="overflow-y-auto mt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {chatbots.map((bot) => (
+                  <Card
+                    key={bot.id}
+                    className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                      selectedChatbotId === bot.id.toString()
+                        ? "border-2 border-black shadow-lg bg-white"
+                        : "hover:border-gray-300 opacity-70 hover:opacity-100 bg-gray-50"
+                    }`}
+                    onClick={() => handleCardClick(bot.id.toString())}
+                  >
+                    <CardHeader className="flex flex-row items-center justify-between pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 bg-primary/10 rounded-lg">
+                          <Bot className="h-6 w-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-xl">{bot.name}</h3>
+                        </div>
+                      </div>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          asChild
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-red-600"
-                          onClick={() => handleDeleteClick(bot.id)}
-                        >
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-center text-gray-600">
-                      <Bot className="mr-2 h-4 w-4" />
-                      <span>Status: {bot.status}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Crown className="mr-2 h-4 w-4" />
-                      <span>
-                        Abonnement: {bot.active ? "Actif" : "Non actif"}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Globe className="mr-2 h-4 w-4" />
-                      <span>
-                        Created: {new Date(bot.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                          <Button
+                            variant="ghost"
+                            className="h-8 w-8 p-0 hover:bg-gray-100"
+                          >
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setIsEditing(true);
+                              setSelectedChatbot(bot.id.toString());
+                              setOpen(true);
+                            }}
+                            className="cursor-pointer hover:bg-gray-100"
+                          >
+                            <Settings className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-600 cursor-pointer hover:bg-red-50"
+                            onClick={(e) => handleDeleteClick(bot.id)}
+                          >
+                            <Trash className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </CardHeader>
+
+                    <CardContent className="border-t pt-4">
+                      <div className="flex flex-col space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <p className="text-sm text-muted-foreground">
+                              Status
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`w-2 h-2 rounded-full ${
+                                  bot.status === "public"
+                                    ? "bg-green-500"
+                                    : "bg-gray-500"
+                                }`}
+                              />
+                              <span className="font-medium capitalize">
+                                {bot.status}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="space-y-1">
+                            <p className="text-sm text-muted-foreground">
+                              Abonnement
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Crown className="h-4 w-4 text-yellow-500" />
+                              <span className="font-medium">
+                                {bot.active ? "Actif" : "Non actif"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <div className="space-y-1">
+                            <p className="text-sm text-muted-foreground">
+                              Créé le
+                            </p>
+                            <div className="flex items-center gap-2">
+                              <Globe className="h-4 w-4 text-blue-500" />
+                              <span className="font-medium">
+                                {new Date(bot.createdAt).toLocaleDateString()}
+                              </span>
+                            </div>
+                          </div>
+
+                          <Button
+                            className="bg-black text-white hover:bg-gray-800 transition-colors gap-2"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              // TODO: Ajouter la logique pour afficher le QR code
+                            }}
+                          >
+                            <QrCode className="h-4 w-4" />
+                            Flyer
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
           ) : (
-            <div className="flex min-h-[70vh] gap-4 flex-col items-center justify-center text-center">
-              <div className="mb-6 rounded-full bg-gray-100 p-8">
-                <Bot className="h-12 w-12 text-gray-400" />
+            <div
+              className="flex items-center justify-center"
+              style={{ minHeight: "calc(100vh - 300px)" }}
+            >
+              <div className="flex flex-col items-center gap-3 text-center">
+                <div className="mb-6 rounded-full bg-gray-100 p-8">
+                  <Bot className="h-12 w-12 text-gray-400" />
+                </div>
+                <h1 className="mb-2 text-2xl font-bold">
+                  Créez votre premier chatbot
+                </h1>
+                <p className="mb-8 text-gray-600">
+                  Vous n'avez pas encore de chatbot. Créez-en un maintenant pour
+                  commencer.
+                </p>
+                <Button
+                  onClick={() => setOpen(true)}
+                  className="bg-black text-white hover:bg-gray-800 transition-colors"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  Créer un chatbot
+                </Button>
               </div>
-              <h1 className="mb-2 text-2xl font-bold">
-                Start Creating Your First Chatbot
-              </h1>
-              <p className="mb-8 text-gray-600">
-                Looks like you haven&apos;t set up a chatbot yet. Create one now
-                and start to help your client.
-              </p>
-              <Button
-                onClick={() => setOpen(true)}
-                className="bg-black text-white hover:bg-gray-800 transition-colors"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                Create Chatbot
-              </Button>
             </div>
           )}
         </div>
