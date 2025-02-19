@@ -9,23 +9,6 @@ export async function GET(req: Request) {
     console.log("\n\n㊙️㊙️ === DÉBUT GET ALL CHATBOTS ===");
     console.log("Cookies avant la requête:", combinedCookies);
 
-    // Première requête pour récupérer le XSRF-TOKEN
-    const xsrfRes = await fetch(`${process.env.API_URL}/sanctum/csrf-cookie`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Cookie: combinedCookies,
-        Referer: "http://localhost:3000",
-      },
-      credentials: "include",
-    });
-
-    const xsrfToken = xsrfRes.headers
-      .get("set-cookie")
-      ?.match(/XSRF-TOKEN=([^;]+)/)?.[1];
-    console.log("🌟 XSRF-TOKEN récupéré:", xsrfToken);
-
     // Requête principale avec XSRF-TOKEN
     const res = await fetch(`${process.env.API_URL}/chatbots`, {
       method: "GET",
@@ -33,7 +16,6 @@ export async function GET(req: Request) {
         "Content-Type": "application/json",
         Accept: "application/json",
         Cookie: combinedCookies,
-        "X-XSRF-TOKEN": xsrfToken || "",
         Referer: "http://localhost:3000",
       },
       credentials: "include",

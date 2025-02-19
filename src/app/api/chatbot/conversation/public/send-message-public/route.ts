@@ -6,7 +6,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as SendChatbotConversationMessageBody;
+    const body = {
+      message: (await req.json()).message,
+      chatbotId: "6",
+      conversationId: "aec85fd4-3e19-4f6a-b08e-fc0e1f6aedd5",
+    };
 
     const res = await fetch(
       `${process.env.API_URL}/chatbot/message/send/${body.chatbotId}/${body.conversationId}`,
@@ -24,17 +28,7 @@ export async function POST(req: Request) {
     );
 
     const data = (await res.json()) as SendChatbotConversationMessageResponse;
-
-    // Créer la réponse
-    const response = NextResponse.json(data);
-
-    // Récupérer et transmettre les nouveaux cookies
-    const newCookies = res.headers.get("set-cookie");
-    if (newCookies) {
-      response.headers.set("Set-Cookie", newCookies);
-    }
-
-    return response;
+    return NextResponse.json(data);
   } catch (error) {
     return NextResponse.json(
       { error: "Erreur lors de l'envoi du message" },

@@ -4,28 +4,22 @@ import { extractCookies } from "@/utils/cookies";
 
 export async function POST(req: Request) {
   try {
-    // Vérifier les cookies envoyés avec la requête
-    const cookies = req.headers.get("cookie") ?? "";
-    const xsrfTokenMatch = cookies.match(/XSRF-TOKEN=([^;]*)/);
-    const sessionTokenMatch = cookies.match(/gustave_api_session=([^;]*)/);
-
-    if (!xsrfTokenMatch || !sessionTokenMatch) {
-      throw new Error("Les tokens CSRF sont manquants");
-    }
-
-    const xsrfToken = decodeURIComponent(xsrfTokenMatch[1]);
-    const sessionToken = decodeURIComponent(sessionTokenMatch[1]);
+    const headers = Object.fromEntries(req.headers);
+    const { combinedCookies, xsrfToken } = extractCookies(headers);
 
     const body = (await req.json()) as CreateChatBotBody;
 
-    // Effectuer la requête de création du chatbot avec les tokens CSRF
+    console.log("\n\n㊙️㊙️ === DÉBUT CREATE CHATBOT ===");
+    console.log("Cookies avant la requête:", combinedCookies);
+    console.log("XSRF Token:", xsrfToken);
+
     const createRes = await fetch(`${process.env.API_URL}/create/chatbot`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-XSRF-TOKEN": xsrfToken,
-        Cookie: `gustave_api_session=${sessionToken}`,
+        Cookie: combinedCookies,
+        "X-XSRF-TOKEN": decodeURIComponent(xsrfToken),
         Referer: "http://localhost:3000",
       },
       credentials: "include",
@@ -44,13 +38,16 @@ export async function POST(req: Request) {
       { status: createRes.ok ? 200 : createRes.status }
     );
 
-    // Transmettre les cookies dans la réponse
+    // Transmettre les cookies dans la réponse UNIQUEMENT si la requête est réussie
     const newCookies = createRes.headers.get("set-cookie");
-    if (newCookies) {
-      const cookieStrings = newCookies.split(/,(?=[^,]+=)/);
+    console.log("🫱‍🫲🫱‍🫲 Nouveaux cookies après la requête:", newCookies);
+
+    if (createRes.ok && newCookies) {
+      const cookieStrings = newCookies.split(/,(?=\s*[A-Za-z0-9_-]+=)/);
       cookieStrings.forEach((cookie) => {
-        const fixedCookie = cookie.trim().replace(/Path=\/.+?/gi, "Path=/");
+        const fixedCookie = cookie.trim().replace(/Path=\/(?!;)/g, "Path=/;");
         response.headers.append("set-cookie", fixedCookie);
+        console.log("🫱🫱‍🫲 Fixed cookie:", fixedCookie);
       });
     }
 

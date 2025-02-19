@@ -8,75 +8,15 @@ import {
   Chatbot,
 } from "@/types/chatbot";
 
-export async function getCsrfTokens(): Promise<CsrfTokens> {
-  // Vérifier si on a déjà des tokens valides
-  const existingTokens = localStorage.getItem("csrf_tokens");
-  const expiration = localStorage.getItem("csrf_tokens_expiration");
-
-  if (existingTokens && expiration && Date.now() < parseInt(expiration)) {
-    return {
-      xsrfToken: existingTokens.split(";")[0],
-      sessionToken: existingTokens.split(";")[1],
-    };
-  }
-
-  // Si pas de tokens ou expirés, en demander de nouveaux
-  localStorage.removeItem("csrf_tokens");
-  localStorage.removeItem("csrf_tokens_expiration");
-
-  // Récupérer CSRF Token depuis Laravel
-  const csrfResponse = await fetch("/sanctum/csrf-cookie", {
-    method: "GET",
-    credentials: "include",
-  });
-
-  if (!csrfResponse.ok) {
-    throw new Error("Échec de la récupération du token CSRF");
-  }
-
-  const cookies = document.cookie; // Prendre directement les cookies
-
-  const xsrfMatch = cookies.match(/XSRF-TOKEN=[^;]+/);
-  const sessionMatch = cookies.match(/gustave_api_session=[^;]+/);
-
-  const tokens = {
-    xsrfToken: xsrfMatch ? xsrfMatch[0].split(";")[0] : "",
-    sessionToken: sessionMatch ? sessionMatch[0].split(";")[0] : "",
-  };
-
-  // Stocker les tokens avec expiration (120 minutes)
-  const expiresIn = 120 * 60 * 1000;
-  localStorage.setItem(
-    "csrf_tokens_expiration",
-    (Date.now() + expiresIn).toString()
-  );
-  localStorage.setItem(
-    "csrf_tokens",
-    `${tokens.xsrfToken};${tokens.sessionToken}`
-  );
-
-  return tokens;
-}
-
-function getXsrfToken(): string | null {
-  const tokens = localStorage.getItem("csrf_tokens");
-  if (!tokens) return null;
-  const [xsrfToken] = tokens.split(";");
-  return xsrfToken.replace("XSRF-TOKEN=", "");
-}
-
 export const postCreateChatbot = async (data: CreateChatBotBody) => {
-  const { xsrfToken, sessionToken } = await getCsrfTokens(); // on récupère les tokens
-
+  console.log("Cookies avant création:", document.cookie);
   const response = await fetch("/api/chatbot/create", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "X-XSRF-TOKEN": xsrfToken || "", // envoie X-XSRF-TOKEN dans les headers
-      Cookie: `XSRF-TOKEN=${xsrfToken}; gustave_api_session=${sessionToken}`, // envoie les cookies dans la requête
     },
-    credentials: "include", // Utilisation de "include" pour envoyer les cookies avec la requête
+    credentials: "include",
     body: JSON.stringify(data),
   });
   console.log("Cookies après création:", document.cookie);
