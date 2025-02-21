@@ -72,7 +72,7 @@ export function PublicChatbot() {
                 </div>
                 <div className="text-center">
                   <h2 className="text-xl font-semibold text-white mb-2">
-                    Comment puis-je vous aider aujourd'hui ?
+                    Comment puis-je vous aider aujourd&apos;hui ?
                   </h2>
                   <p className="text-gray-400 text-sm">
                     Je suis là pour répondre à vos questions
@@ -84,7 +84,7 @@ export function PublicChatbot() {
             messages.map((message, i) => (
               <div
                 key={i}
-                className={`flex ${
+                className={`h-full flex ${
                   message.role === "user" ? "justify-end" : "justify-start"
                 } animate-slide-in`}
               >
