@@ -22,7 +22,10 @@ type PublicChatbotMessagesResponse = {
   }>;
 };
 
-export function usePublicChatbotMessages() {
+export function usePublicChatbotMessages(p0: {
+  chatbotId: string;
+  conversationId: string;
+}) {
   return useQuery({
     queryKey: ["public-chatbot-messages"],
     queryFn: getPublicConversationMessages,

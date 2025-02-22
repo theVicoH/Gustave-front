@@ -4,19 +4,45 @@ import { useState, useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2, MessageSquare, Send } from "lucide-react";
-
-type Message = {
-  role: "user" | "assistant";
-  content: string;
-};
+import { Loader2, Bot, Send } from "lucide-react";
+import { MessageSquare } from "lucide-react";
+import {
+  usePublicChatbotMessages,
+  useSendPublicChatbotMessage,
+} from "@/hooks/use-public-chatbot";
+import { usePublicConversationStore } from "@/stores/public-chatbot-conversation-store";
 
 export function PublicChatbot() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { mutate, isPending } = useSendPublicChatbotMessage();
+  const { messages, resetMessages, addMessage } = usePublicConversationStore();
+  const { data, isLoading } = usePublicChatbotMessages({
+    chatbotId: "6",
+    conversationId: "aec85fd4-3e19-4f6a-b08e-fc0e1f6aedd5",
+  });
 
+  // Effet pour charger les messages initiaux
+  useEffect(() => {
+    if (data?.chatbots) {
+      console.log("Messages reçus:", data.chatbots);
+      resetMessages();
+
+      data.chatbots.forEach((item) => {
+        if (item.data?.attributes) {
+          const { user_message, assistant_message } = item.data.attributes;
+          if (user_message) {
+            addMessage("user", user_message);
+          }
+          if (assistant_message) {
+            addMessage("assistant", assistant_message);
+          }
+        }
+      });
+    }
+  }, [data, addMessage, resetMessages]);
+
+  // Effet pour le scroll automatique
   useEffect(() => {
     const scrollToBottom = () => {
       if (scrollAreaRef.current) {
@@ -29,49 +55,65 @@ export function PublicChatbot() {
       }
     };
 
+    // Scroll immédiatement
     scrollToBottom();
+
+    // Scroll après un délai pour s'assurer que le contenu est rendu
     const timeoutId = setTimeout(scrollToBottom, 100);
-    return () => clearTimeout(timeoutId);
+
+    // Scroll après un délai plus long pour les messages longs
+    const longTimeoutId = setTimeout(scrollToBottom, 500);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(longTimeoutId);
+    };
   }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || isPending) return;
 
     const userMessage = input;
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    addMessage("user", userMessage);
 
-    setIsLoading(true);
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            "This is a placeholder response.This is a placeholder response Integrate your actual API call here.Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?Comment puis-je vous aider aujourd'hui ?",
+    mutate(
+      {
+        message: userMessage,
+        chatbotId: "6",
+        conversationId: "aec85fd4-3e19-4f6a-b08e-fc0e1f6aedd5",
+      },
+      {
+        onSuccess: (response) => {
+          if (response.data?.attributes?.message?.content) {
+            addMessage("assistant", response.data.attributes.message.content);
+          }
         },
-      ]);
-      setIsLoading(false);
-    }, 1000);
+      }
+    );
   };
 
   return (
-    <div className="flex flex-col min-h-screen max-w-[800px] mx-auto">
-      <div className="flex items-center justify-center p-4 border-b border-gray-800">
+    <div className="flex flex-col h-[100vh] max-w-[800px] mx-auto">
+      <div className="flex items-center justify-center p-4 border-b border-gray-700">
         <h1 className="text-xl font-bold text-white">GUSTAVE</h1>
       </div>
 
-      <ScrollArea ref={scrollAreaRef} className="flex-1 px-4 py-8 h-full">
-        <div className="flex flex-col space-y-8  h-full gap-4">
+      <ScrollArea
+        ref={scrollAreaRef}
+        className="flex-1 overflow-hidden"
+        style={{ height: "calc(100vh - 8rem)" }}
+      >
+        <div className="flex flex-col space-y-8 px-4 py-8">
           {messages.length === 0 ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 animate-fade-in-up">
-              <div className="flex flex-col h-full items-center justify-center ">
-                <div className="bg-gray-800 p-4 rounded-full  ">
-                  <MessageSquare className="h-8 w-8 text-gray-400" />
+              <div className="flex flex-col h-full items-center justify-center gap-3">
+                <div className="bg-black p-4 rounded-full">
+                  <MessageSquare className="h-6 w-6 text-gray-400" />
                 </div>
                 <div className="text-center">
-                  <h2 className="text-xl font-semibold text-white mb-2">
+                  <h2 className="text-lg font-semibold text-white mb-2">
                     Comment puis-je vous aider aujourd&apos;hui ?
                   </h2>
                   <p className="text-gray-400 text-sm">
@@ -89,28 +131,33 @@ export function PublicChatbot() {
                 } animate-slide-in`}
               >
                 {message.role === "assistant" && (
-                  <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2">
-                    <MessageSquare className="h-4 w-4 text-gray-500" />
+                  <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center mr-2">
+                    <Bot className="h-4 w-4 text-gray-300" />
                   </div>
                 )}
                 <div
-                  className={`rounded-lg px-4 py-5 max-w-[80%] ${
+                  className={`rounded-xl max-w-[80%] ${
                     message.role === "user"
-                      ? "bg-black text-white"
-                      : "bg-black text-white"
+                      ? "bg-black px-4 py-2 text-white break-all"
+                      : "bg-black px-4 py-3 text-white"
                   }`}
+                  style={
+                    message.role === "assistant"
+                      ? { wordBreak: "break-word" }
+                      : {}
+                  }
                 >
-                  {message.content}
+                  <p className="">{message.content}</p>
                 </div>
               </div>
             ))
           )}
-          {isLoading && (
+          {isPending && (
             <div className="flex items-start animate-fade-in">
-              <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center mr-2">
-                <MessageSquare className="h-4 w-4 text-gray-500" />
+              <div className="w-8 h-8 rounded-full bg-black flex items-center justify-center mr-2">
+                <Bot className="h-4 w-4 text-gray-300" />
               </div>
-              <div className="bg-gray-700 rounded-lg px-4 py-2.5">
+              <div className="bg-black rounded-lg px-4 py-2.5">
                 <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
               </div>
             </div>
@@ -118,7 +165,7 @@ export function PublicChatbot() {
         </div>
       </ScrollArea>
 
-      <div className="border-t border-gray-700 p-4">
+      <div className="sticky bottom-0 border-t border-gray-700 p-4 bg-[#1E1F20]">
         <form
           onSubmit={handleSubmit}
           className="flex gap-2 max-w-[800px] mx-auto"
@@ -127,13 +174,13 @@ export function PublicChatbot() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Message..."
-            className="flex-1 bg-gray-700 border-gray-700  placeholder:text-gray-400 focus:ring-blue-500"
-            disabled={isLoading}
+            className="flex-1 bg-black text-white border-gray-700 placeholder:text-gray-400 focus:ring-blue-500"
+            disabled={isPending}
           />
           <Button
             type="submit"
-            disabled={isLoading}
-            className="bg-[#2563eb] hover:bg-blue-700 text-white px-4"
+            disabled={isPending}
+            className="bg-black hover:bg-gray-900 text-white px-4"
           >
             <Send className="h-4 w-4" />
           </Button>
