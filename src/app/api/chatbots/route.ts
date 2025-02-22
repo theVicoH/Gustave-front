@@ -1,39 +1,17 @@
+import { NextApiService } from "@/app/core/api/NextApiService";
 import { NextResponse } from "next/server";
-import { extractCookies } from "@/utils/cookies";
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
-    const headers = Object.fromEntries(req.headers);
-    const { combinedCookies } = extractCookies(headers);
-
     console.log("\n\n㊙️㊙️ === DÉBUT GET ALL CHATBOTS ===");
-    console.log("Cookies avant la requête:", combinedCookies);
-
-    // Requête principale avec XSRF-TOKEN
-    const res = await fetch(`${process.env.API_URL}/chatbots`, {
-      method: "GET",
+    
+    const api = new NextApiService();
+    return await api.get('/chatbots', {
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Cookie: combinedCookies,
-        Referer: "http://localhost:3000",
-      },
-      credentials: "include",
-    });
+        'Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      }
+    }, request);
 
-    const data = await res.json();
-
-    const response = NextResponse.json(data);
-
-    // Récupérer et transmettre les nouveaux cookies
-    const newCookies = res.headers.get("set-cookie");
-    console.log("🫱‍🫲🫱‍🫲 Nouveaux cookies après la requête:", newCookies);
-
-    if (newCookies) {
-      response.headers.set("Set-Cookie", newCookies);
-    }
-
-    return response;
   } catch (error) {
     console.error("Erreur finale:", error);
     return NextResponse.json(

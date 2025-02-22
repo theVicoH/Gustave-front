@@ -1,7 +1,6 @@
-interface CsrfTokens {
-  xsrfToken: string;
-  sessionToken: string;
-}
+import ApiService from '@/app/core/web/ApiService';
+
+const api = new ApiService('/api');
 
 interface LoginData {
   email: string;
@@ -18,121 +17,6 @@ interface LoginResponse {
   };
 }
 
-export async function getCsrfTokens(): Promise<CsrfTokens> {
-  // Vérifier si on a déjà des tokens valides
-  const existingTokens = localStorage.getItem("csrf_tokens");
-  const expirationTime = localStorage.getItem("csrf_tokens_expiration");
-
-  if (existingTokens && expirationTime) {
-    const isExpired = Date.now() > parseInt(expirationTime);
-    if (!isExpired) {
-      const [xsrfToken, sessionToken] = existingTokens.split(";");
-      return {
-        xsrfToken,
-        sessionToken,
-      };
-    }
-  }
-
-  // Si pas de tokens ou expirés, en demander de nouveaux
-  localStorage.removeItem("csrf_tokens");
-  localStorage.removeItem("csrf_tokens_expiration");
-
-  const response = await fetch("/api/csrf", {
-    method: "GET",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  const data = await response.json();
-  const cookies = data.cookies || "";
-
-  const xsrfMatch = cookies.match(/XSRF-TOKEN=[^;]+/);
-  const sessionMatch = cookies.match(/gustave_api_session=[^;]+/);
-
-  const tokens = {
-    xsrfToken: xsrfMatch ? xsrfMatch[0].split(";")[0] : "",
-    sessionToken: sessionMatch ? sessionMatch[0].split(";")[0] : "",
-  };
-  console.log(document.cookie);
-  // Stocker les tokens avec expiration (120 minutes)
-  const expiresIn = 120 * 60 * 1000;
-  localStorage.setItem(
-    "csrf_tokens_expiration",
-    (Date.now() + expiresIn).toString()
-  );
-  localStorage.setItem(
-    "csrf_tokens",
-    `${tokens.xsrfToken};${tokens.sessionToken}`
-  );
-
-  return tokens;
-}
-
-// Nouvelle fonction pour extraire le token XSRF
-function getXsrfToken(): string | null {
-  const tokens = localStorage.getItem("csrf_tokens");
-  if (!tokens) return null;
-  const [xsrfToken] = tokens.split(";");
-  return xsrfToken.replace("XSRF-TOKEN=", "");
-}
-
-export async function login(data: LoginData): Promise<LoginResponse> {
-  try {
-    console.log("Cookies avant login:", document.cookie);
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(data),
-    });
-
-    const responseData = await response.json();
-    console.log("Response from login:", responseData);
-    console.log(
-      "Headers React:",
-      Object.fromEntries(response.headers.entries())
-    );
-    console.log("Cookies après login:", document.cookie);
-
-    if (!response.ok) {
-      if (response.status === 422) {
-        throw new Error("Email ou mot de passe incorrect");
-      }
-      if (response.status === 429) {
-        throw new Error(
-          "Trop de tentatives de connexion. Veuillez réessayer plus tard"
-        );
-      }
-      throw new Error(
-        responseData.message || "Une erreur est survenue lors de la connexion"
-      );
-    }
-
-    // Vérifier si nous avons les données utilisateur
-    if (!responseData || !responseData.status || !responseData.user) {
-      throw new Error("Données utilisateur manquantes dans la réponse");
-    }
-
-    return {
-      status: responseData.status,
-      message: "Connexion réussie",
-      user: responseData.user,
-    };
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    }
-    throw new Error("Une erreur inattendue est survenue");
-  }
-}
-
 interface RegisterData {
   name: string;
   email: string;
@@ -140,30 +24,88 @@ interface RegisterData {
   password_confirmation: string;
 }
 
-export async function register(data: RegisterData) {
-  await getCsrfTokens();
-  const token = getXsrfToken();
+// Function to get CSRF token from cookies
+function getXsrfTokenFromCookie(): string | null {
+  const cookies = document.cookie.split(';');
+  console.log('Cookies:', document.cookie);
+  const xsrfCookie = cookies.find(cookie => cookie.trim().startsWith('XSRF-TOKEN='));
+  if (!xsrfCookie) return null;
+  return decodeURIComponent(xsrfCookie.split('=')[1]);
+}
 
-  const response = await fetch("/api/auth/register", {
-    method: "POST",
+// Function to get CSRF token
+async function fetchCsrfToken(): Promise<void> {
+  await api.get('/csrf', {
     headers: {
-      "Content-Type": "application/json",
-      "X-XSRF-TOKEN": token || "",
-    },
-    credentials: "include",
-    body: JSON.stringify({
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      password_confirmation: data.password_confirmation,
-    }),
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
   });
+}
 
-  const responseData = await response.json();
+export async function login(data: LoginData): Promise<LoginResponse> {
+  try {
+    // First get CSRF token
+    await fetchCsrfToken();
+    const xsrfToken = getXsrfTokenFromCookie();
+    
+    // Then make login request with CSRF token
+    const response = await api.post('/auth/login', data);
 
-  if (!response.ok) {
-    throw new Error(responseData.error || "Registration failed");
+    if (response.status === 200 || response.status === 204) {
+      return {
+        status: "success",
+        message: "Connexion réussie",
+        user: response.user
+      };
+    }
+
+    throw new Error(response.message || "Échec de la connexion");
+  } catch (error: any) {
+    console.error('Login error details:', error);
+    
+    if (error.status === 422) {
+      throw new Error("Email ou mot de passe incorrect");
+    }
+    if (error.status === 429) {
+      throw new Error("Trop de tentatives de connexion. Veuillez réessayer plus tard");
+    }
+    
+    throw new Error(error.message || "Une erreur inattendue est survenue");
   }
+}
 
-  return responseData;
+export async function register(data: RegisterData): Promise<any> {
+  try {
+    // First get CSRF token
+    await fetchCsrfToken();
+    const xsrfToken = getXsrfTokenFromCookie();
+    
+    // Then make register request with CSRF token
+    const response = await api.post('/auth/register', data, {
+      headers: {
+        'X-XSRF-TOKEN': xsrfToken || ''
+      }
+    });
+
+    if (!response) {
+      throw new Error("Échec de l'inscription");
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Register error details:', error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error("Une erreur est survenue lors de l'inscription");
+  }
+}
+
+export async function logout(): Promise<void> {
+  await api.post('/auth/logout', {});
+}
+
+export async function getUser() {
+  return api.get('/auth/user');
 }
