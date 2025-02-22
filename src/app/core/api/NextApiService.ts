@@ -108,22 +108,19 @@ export class NextApiService {
 
   private async createNextResponseWithHeaders(response: Response): Promise<Response> {
     // Handle empty responses (204 No Content)
-    if (response.status === 204) {
-      return NextResponse.json(null, { 
+    const headers = Object.fromEntries(
+      Array.from(response.headers.entries())
+        .filter(([key]) => !['content-length', 'content-type'].includes(key.toLowerCase()))
+    );
+    if (response.status === 204 || response.headers.get('Content-Length') === '0') {
+      return new Response(null, { 
         status: 204,
-        headers: {
-          'Content-Length': '0'
-        }
+        headers: response.headers
       });
     }
   
     try {
       const data = await response.json();
-
-      const headers = Object.fromEntries(
-        Array.from(response.headers.entries())
-          .filter(([key]) => !['content-length', 'content-type'].includes(key.toLowerCase()))
-      );
   
       return NextResponse.json(data, { 
         status: response.status,
