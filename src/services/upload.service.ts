@@ -1,19 +1,30 @@
-export async function uploadFile(file: File, chatbotId: string) {
+import ApiService from '@/app/core/web/ApiService';
+
+const apiService = new ApiService(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
+
+interface UploadResponse {
+  success: boolean;
+  message?: string;
+  data?: any;
+}
+
+export async function uploadFile(file: File, chatbotId: string): Promise<UploadResponse> {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("type", "source");
   formData.append("relationship", "chatbot");
   formData.append("chatbot_id", chatbotId);
 
-  const response = await fetch("/api/upload", {
-    method: "POST",
-    body: formData,
-  });
+  try {
+    const response = await apiService.post<UploadResponse>('/api/upload', formData, {
+      headers: {
+        'Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+      }
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to upload file");
+    return response;
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw new Error(error instanceof Error ? error.message : 'Failed to upload file');
   }
-
-  return response.json();
 }

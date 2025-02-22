@@ -28,12 +28,16 @@ class ApiService {
             if (body) console.log('Request body:', body);
 
             const headers = await this.getHeaders(options);
+            
+            if (body instanceof FormData) {
+                headers.delete('Content-Type');
+            }
 
             const response = await fetch(`${this.baseUrl}${endpoint}`, {
                 method,
                 headers,
                 credentials: 'include',
-                ...(body && { body: JSON.stringify(body) })
+                body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined
             });
 
             return this.handleResponse(response);
@@ -128,13 +132,15 @@ class ApiService {
 
     private async getHeaders(options?: RequestOptions): Promise<Headers> {
         const headers = new Headers({
-            'Content-Type': 'application/json',
             'Accept': 'application/json',
             ...(options?.headers || {})
         });
 
-        const xsrfToken = this.getXsrfToken();
+        if (!options?.headers?.['Content-Type'] && !options?.headers?.['content-type']) {
+            headers.set('Content-Type', 'application/json');
+        }
 
+        const xsrfToken = this.getXsrfToken();
         if (xsrfToken) {
             headers.append('X-XSRF-TOKEN', xsrfToken);
         }

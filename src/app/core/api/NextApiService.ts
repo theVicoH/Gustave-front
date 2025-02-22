@@ -28,24 +28,27 @@ export class NextApiService {
       'Accept': 'application/json',
       ...config.headers
     });
-  
-    if (body instanceof FormData) {
-      headers.delete('Content-Type');
-    } else if (body) {
-      headers.set('Content-Type', 'application/json');
+
+    // Handle Content-Type header
+    if (body) {
+      if (body instanceof FormData) {
+        headers.delete('Content-Type');
+      } else {
+        headers.set('Content-Type', 'application/json');
+      }
     }
-  
+
     if (originalRequest) {
       originalRequest.headers.forEach((value, key) => {
-        if (body instanceof FormData && (key.toLowerCase() === 'content-type' || key.toLowerCase() === 'content-length')) {
-          return;
+        const lowerKey = key.toLowerCase();
+        if (!['content-type', 'content-length'].includes(lowerKey)) {
+          headers.set(key, value);
         }
-        headers.set(key, value);
       });
     }
-  
+
     return headers;
-  }  
+  }
 
   public async request<T>(
     endpoint: string,
@@ -74,7 +77,8 @@ export class NextApiService {
           error.status,
           error.message,
           error.code,
-          error.details
+          error.details,
+          response.headers
         );
       }
 
@@ -107,11 +111,11 @@ export class NextApiService {
   }
 
   private async createNextResponseWithHeaders(response: Response): Promise<Response> {
-    // Handle empty responses (204 No Content)
     const headers = Object.fromEntries(
       Array.from(response.headers.entries())
         .filter(([key]) => !['content-length', 'content-type'].includes(key.toLowerCase()))
     );
+
     if (response.status === 204 || response.headers.get('Content-Length') === '0') {
       return new Response(null, { 
         status: 204,
@@ -142,7 +146,8 @@ export class NextApiService {
     status: number,
     message: string,
     code: string = 'UNKNOWN_ERROR',
-    details?: any
+    details?: any,
+    originalHeaders?: Headers
   ): Response {
     const errorBody: ErrorResponse = {
       message,
@@ -150,16 +155,22 @@ export class NextApiService {
       details
     };
 
-    const jsonString = JSON.stringify(errorBody);
-    const contentLength = new TextEncoder().encode(jsonString).length.toString();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+
+    if (originalHeaders) {
+      originalHeaders.forEach((value, key) => {
+        const lowerKey = key.toLowerCase();
+        if (!['content-type', 'content-length'].includes(lowerKey)) {
+          headers[key] = value;
+        }
+      });
+    }
 
     return NextResponse.json(errorBody, { 
       status,
-      headers: {
-        ...Object.fromEntries(response.headers.entries()),
-        'Content-Type': 'application/json',
-        'Content-Length': contentLength
-      }
+      headers
     });
   }
 }
