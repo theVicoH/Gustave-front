@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { NextApiService } from "@/app/core/api/NextApiService";
 
-export async function GET(_: Request, { params }: { params: { chatbotId: string } }) {
-  try {
+export async function GET(
+  _: Request,
+  { params }: { params: { chatbotId: string } }
+) {  try {
     const { chatbotId } = params;
     const api = new NextApiService();
 
