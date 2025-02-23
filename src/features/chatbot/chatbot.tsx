@@ -29,16 +29,56 @@ export function Chatbot({
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const { mutate, isPending } = useSendConversationChatbotMessage();
-  const { messages } = useConversationStore();
+  const { messages, resetMessages, addMessage } = useConversationStore();
   const { data, isLoading } = useChatbotConversationAllMessages({
     chatbotId,
     conversationId,
   });
 
+  // Effet pour charger les messages initiaux
   useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    if (data && Array.isArray(data)) {
+      console.log("Données reçues de l'API:", data);
+      resetMessages();
+
+      data.forEach((message) => {
+        if (message.data?.attributes) {
+          const { user_message, assistant_message } = message.data.attributes;
+          if (user_message) {
+            console.log("Ajout message utilisateur:", user_message);
+            addMessage("user", user_message);
+          }
+          if (assistant_message) {
+            console.log("Ajout message assistant:", assistant_message);
+            addMessage("assistant", assistant_message);
+          }
+        }
+      });
     }
+  }, [data, addMessage, resetMessages]);
+
+  // Effet pour le scroll automatique
+  useEffect(() => {
+    const scrollToBottom = () => {
+      if (scrollAreaRef.current) {
+        const scrollElement = scrollAreaRef.current;
+        const viewport = scrollElement.querySelector(
+          "[data-radix-scroll-area-viewport]"
+        );
+
+        if (viewport) {
+          viewport.scrollTop = viewport.scrollHeight;
+        }
+      }
+    };
+
+    // Scroll immédiatement
+    scrollToBottom();
+
+    // Et aussi après un court délai pour s'assurer que le contenu est rendu
+    const timeoutId = setTimeout(scrollToBottom, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [messages]);
 
   const handleSend = () => {
@@ -103,28 +143,39 @@ export function Chatbot({
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  {message.sender === "assistant" && !message.content ? (
+                    <div className="flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900" />
+                      <span>Thinking...</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm whitespace-pre-line">
+                      {message.content}
+                    </p>
+                  )}
                 </Card>
               </div>
             ))}
           </div>
         )}
       </ScrollArea>
-
-      <div className="p-4 border-t mt-auto">
-        <div className="flex gap-2">
-          <Input
-            placeholder={placeholder}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            className="flex-1"
-            disabled={isPending}
-          />
-          <Button onClick={handleSend} size="icon" disabled={isPending}>
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
+      <div className="p-4 border-t flex gap-4">
+        <Input
+          placeholder={placeholder}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
+          className="flex-1"
+          disabled={isPending}
+        />
+        <Button onClick={handleSend} size="icon" disabled={isPending}>
+          <Send className="w-4 h-4" />
+        </Button>
       </div>
     </Card>
   );

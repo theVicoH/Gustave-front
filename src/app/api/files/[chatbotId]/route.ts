@@ -1,22 +1,16 @@
 import { NextResponse } from "next/server";
+import { NextApiService } from "@/app/core/api/NextApiService";
 
 export async function GET(
   _: Request,
   { params }: { params: { chatbotId: string } }
-) {
-  try {
+) {  try {
     const { chatbotId } = params;
+    const api = new NextApiService();
 
-    const response = await fetch(`${process.env.API_URL}/files/${chatbotId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = await response.json();
-    return NextResponse.json(data);
+    return await api.get(`/files/${chatbotId}`);
   } catch (error) {
+    console.error("Erreur lors de la récupération des fichiers:", error);
     return NextResponse.json(
       { error: "Failed to fetch files" },
       { status: 500 }

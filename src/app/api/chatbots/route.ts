@@ -1,11 +1,22 @@
-export async function GET() {
-  const res = await fetch(`${process.env.API_URL}/chatbots`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+import { NextApiService } from "@/app/core/api/NextApiService";
+import { NextResponse } from "next/server";
 
-  const data = await res.json();
-  return Response.json(data);
+export async function GET(request: Request) {
+  try {
+    console.log("\n\n㊙️㊙️ === DÉBUT GET ALL CHATBOTS ===");
+    
+    const api = new NextApiService();
+    return await api.get('/chatbots', {
+      headers: {
+        'Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+      }
+    }, request);
+
+  } catch (error) {
+    console.error("Erreur finale:", error);
+    return NextResponse.json(
+      { error: "Une erreur est survenue lors de la récupération des chatbots" },
+      { status: 500 }
+    );
+  }
 }

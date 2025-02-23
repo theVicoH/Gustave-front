@@ -1,51 +1,56 @@
 import { NextResponse } from "next/server";
+import { NextApiService } from "@/app/core/api/NextApiService";
 
 export async function DELETE(
-  _: Request,
-  { params }: { params: { fileId: string } }
+  request: Request,
+  context: { params: { fileId: string } }
 ) {
   try {
-    const { fileId } = params;
+    const fileId = await context.params.fileId;
+    const api = new NextApiService();
 
-    const response = await fetch(`${process.env.API_URL}/file/${fileId}`, {
-      method: "DELETE",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+    const response = await api.delete(
+      `/file/${fileId}`,
+      {
+        headers: {
+          'Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        }
       },
+      request
+    );
+
+    // Handle 204 No Content response
+    if (response.status === 204 || response.status === 404) {
+      return NextResponse.json({
+        success: true,
+        message: "Le fichier a bien été supprimé"
+      });
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return NextResponse.json(
+        {
+          success: false,
+          message: errorData.message || "Une erreur est survenue lors de la suppression"
+        },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json({
+      success: true,
+      message: "Le fichier a bien été supprimé",
+      data
     });
 
-    // Si c'est 204, pas besoin de parser le JSON
-    if (response.status === 204) {
-      return NextResponse.json({
-        success: true,
-        message: "Le fichier a bien été supprimé",
-      });
-    }
-
-    // Pour les autres statuts, on essaie de parser le JSON
-    const data = await response.json();
-
-    if (response.ok || response.status === 404) {
-      return NextResponse.json({
-        success: true,
-        message: "Le fichier a bien été supprimé",
-      });
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Le fichier n'a pas pu être supprimé",
-      },
-      { status: response.status }
-    );
   } catch (error) {
     console.error("Delete error:", error);
     return NextResponse.json(
       {
         success: false,
-        message: "Le fichier n'a pas pu être supprimé",
+        message: error instanceof Error ? error.message : "Une erreur est survenue lors de la suppression"
       },
       { status: 500 }
     );

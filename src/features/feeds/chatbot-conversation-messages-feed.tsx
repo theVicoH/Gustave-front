@@ -19,25 +19,37 @@ const ChatbotConversationMessagesFeed: React.FC<
     conversationId,
   });
   const { toast } = useToast();
-  const { messages, addMessage } = useConversationStore();
+  const { messages, addMessage, resetMessages } = useConversationStore();
 
   useEffect(() => {
     if (error) {
       toast({
-        title: "Error retryving messages",
+        title: "Error retrieving messages",
         description: "Try again later",
       });
     }
   }, [error, toast]);
 
   useEffect(() => {
-    if (data && data.length > 0 && messages.length === 0) {
+    if (data && Array.isArray(data)) {
+      console.log("Données reçues de l'API:", data);
+      resetMessages();
+
       data.forEach((message) => {
-        addMessage("user", message.data.attributes.user_message);
-        addMessage("assistant", message.data.attributes.assistant_message);
+        if (message.data?.attributes) {
+          const { user_message, assistant_message } = message.data.attributes;
+          if (user_message) {
+            console.log("Ajout message utilisateur:", user_message);
+            addMessage("user", user_message);
+          }
+          if (assistant_message) {
+            console.log("Ajout message assistant:", assistant_message);
+            addMessage("assistant", assistant_message);
+          }
+        }
       });
     }
-  }, [data, addMessage, messages]);
+  }, [data, addMessage, resetMessages]);
 
   if (isLoading) {
     return (
@@ -45,6 +57,10 @@ const ChatbotConversationMessagesFeed: React.FC<
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
+  }
+
+  if (!data) {
+    return null;
   }
 
   return (

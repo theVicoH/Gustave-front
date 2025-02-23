@@ -41,6 +41,12 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
   const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
+  const chatbots = useChatbotStore((state) => state.chatbots);
+
+  // Trouver le bot sélectionné
+  const selectedBot = chatbots.find(
+    (bot) => bot.id.toString() === selectedChatbotId
+  );
 
   return (
     <div className="h-full relative flex overflow-x-hidden">
@@ -140,7 +146,9 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 <Menu className="h-6 w-6" />
               </Button>
             </SidebarTrigger>
-            <h1 className="text-xl font-semibold ml-4"></h1>
+            <h1 className="text-l font-semibold ml-4">
+              {selectedBot && `ChatBot Sélectionné: " ${selectedBot.name} "`}
+            </h1>
           </div>
           <UserNav />
         </header>

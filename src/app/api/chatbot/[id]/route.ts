@@ -1,38 +1,53 @@
+import { NextApiService } from "@/app/core/api/NextApiService";
+
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  const body = await req.json();
+  try {
+    const api = new NextApiService();
+    const body = await req.json();
 
-  const res = await fetch(
-    `${process.env.API_URL}/update/chatbot/${params.id}`,
-    {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
+    return await api.put(
+      `/update/chatbot/${params.id}`,
+      body,
+      {
+        headers: {
+          'Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        }
       },
-      body: JSON.stringify(body),
-    }
-  );
-
-  const data = await res.json();
-  return Response.json(data);
+      req
+    );
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour du chatbot:", error);
+    return Response.json(
+      { error: "Une erreur est survenue lors de la mise à jour" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }
 ) {
-  const res = await fetch(
-    `${process.env.API_URL}/delete/chatbot/${params.id}`,
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  try {
+    const api = new NextApiService();
 
-  const data = await res.json();
-  return Response.json(data);
+    return await api.delete(
+      `/delete/chatbot/${params.id}`,
+      {
+        headers: {
+          'Referer': process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+        }
+      },
+      req
+    );
+  } catch (error) {
+    console.error("Erreur lors de la suppression du chatbot:", error);
+    return Response.json(
+      { error: "Une erreur est survenue lors de la suppression" },
+      { status: 500 }
+    );
+  }
 }
