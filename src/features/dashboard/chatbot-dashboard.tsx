@@ -30,6 +30,7 @@ import CreateChatbotForm from "@/features/forms/create-chatbot-form";
 import { useDeleteChatbot } from "@/hooks/use-delete-chatbot";
 import { useGetAllChatbots } from "@/hooks/use-get-all-chatbots";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDownloadFlyer } from "@/hooks/use-download-flyer";
 
 export function ChatbotDashboard() {
   const { data: chatbots = [], isLoading } = useGetAllChatbots();
@@ -43,6 +44,7 @@ export function ChatbotDashboard() {
     (state) => state.setSelectedChatbot
   );
   const selectedChatbotId = useChatbotStore((state) => state.selectedChatbotId);
+  const downloadFlyer = useDownloadFlyer();
 
   console.log("Current selectedChatbotId:", selectedChatbotId);
 
@@ -96,6 +98,10 @@ export function ChatbotDashboard() {
     }
   };
 
+  const handleDownloadFlyer = (chatbotId: string) => {
+    downloadFlyer.mutate(chatbotId);
+  };
+
   return (
     <div className="h-full overflow-hidden">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8  mb-12">
@@ -145,7 +151,7 @@ export function ChatbotDashboard() {
                 {chatbots.map((bot) => (
                   <Card
                     key={bot.id}
-                    className={`cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                    className={`cursor-pointer transition-all duration-200  ${
                       selectedChatbotId === bot.id.toString()
                         ? "border-2 border-black shadow-lg bg-white"
                         : "hover:border-gray-300 opacity-70 hover:opacity-100 bg-gray-50"
@@ -200,16 +206,16 @@ export function ChatbotDashboard() {
                     <CardContent className="border-t pt-4">
                       <div className="flex flex-col space-y-4">
                         <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <p className="text-sm text-muted-foreground">
+                          <div className="space-y-1  ">
+                            <p className="text-sm text-muted-foreground  w-fit py-1 px-2 bg-gray-100 font-bold text-black rounded-md">
                               Status
                             </p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 !mt-2">
                               <div
                                 className={`w-2 h-2 rounded-full ${
                                   bot.status === "public"
                                     ? "bg-green-500"
-                                    : "bg-gray-500"
+                                    : "bg-red-500"
                                 }`}
                               />
                               <span className="font-medium capitalize">
@@ -219,10 +225,10 @@ export function ChatbotDashboard() {
                           </div>
 
                           <div className="space-y-1">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground  w-fit py-1 px-2 bg-gray-100 font-bold text-black rounded-md">
                               Abonnement
                             </p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 !mt-2">
                               <Crown className="h-4 w-4 text-yellow-500" />
                               <span className="font-medium">
                                 {bot.active ? "Actif" : "Non actif"}
@@ -233,10 +239,10 @@ export function ChatbotDashboard() {
 
                         <div className="flex justify-between items-center">
                           <div className="space-y-1">
-                            <p className="text-sm text-muted-foreground">
+                            <p className="text-sm text-muted-foreground w-fit py-1 px-2 bg-gray-100 font-bold text-black rounded-md">
                               Créé le
                             </p>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 !mt-2">
                               <Globe className="h-4 w-4 text-blue-500" />
                               <span className="font-medium">
                                 {new Date(bot.createdAt).toLocaleDateString()}
@@ -245,10 +251,10 @@ export function ChatbotDashboard() {
                           </div>
 
                           <Button
-                            className="bg-black text-white hover:bg-gray-800 transition-colors gap-2"
+                            className="bg-black text-white hover:bg-gray-800 transition-colors self-end gap-2"
                             onClick={(e) => {
                               e.stopPropagation();
-                              // TODO: Ajouter la logique pour afficher le QR code
+                              handleDownloadFlyer(bot.id);
                             }}
                           >
                             <QrCode className="h-4 w-4" />

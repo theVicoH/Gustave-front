@@ -1,3 +1,5 @@
+"use client";
+
 import { PublicChatbot } from "@/features/chatbot/public-chatbot";
 
 export default function UserChatbotPage() {

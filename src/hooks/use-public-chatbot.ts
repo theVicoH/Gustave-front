@@ -22,16 +22,22 @@ type PublicChatbotMessagesResponse = {
   }>;
 };
 
-export function usePublicChatbotMessages(p0: {
+export const usePublicChatbotMessages = ({
+  chatbotId,
+  conversationId,
+}: {
   chatbotId: string;
   conversationId: string;
-}) {
+}) => {
+  console.log("🎣 Hook - Received params:", { chatbotId, conversationId });
+
   return useQuery({
-    queryKey: ["public-chatbot-messages"],
-    queryFn: getPublicConversationMessages,
-    refetchOnWindowFocus: false,
+    queryKey: ["publicChatbotMessages", chatbotId, conversationId],
+    queryFn: () => getPublicConversationMessages({ chatbotId, conversationId }),
+    enabled: Boolean(chatbotId) && Boolean(conversationId),
+    retry: false,
   });
-}
+};
 
 export function useSendPublicChatbotMessage() {
   const queryClient = useQueryClient();

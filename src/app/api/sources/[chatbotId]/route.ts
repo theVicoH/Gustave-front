@@ -8,7 +8,7 @@ export async function GET(
     const { chatbotId } = params;
 
     const response = await fetch(
-      `${process.env.API_URL}/sources/${chatbotId}`,
+      `${process.env.API_ENVIRONMENT_URL}/sources/${chatbotId}`,
       {
         method: "GET",
         headers: {

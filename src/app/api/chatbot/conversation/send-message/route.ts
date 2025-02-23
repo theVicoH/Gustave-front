@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const body = (await req.json()) as SendChatbotConversationMessageBody;
 
     const res = await fetch(
-      `${process.env.API_URL}/chatbot/message/send/${body.chatbotId}/${body.conversationId}`,
+      `${process.env.API_ENVIRONMENT_URL}/chatbot/message/send/${body.chatbotId}/${body.conversationId}`,
       {
         method: "POST",
         headers: {

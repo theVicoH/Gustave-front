@@ -11,16 +11,40 @@ import {
   useSendPublicChatbotMessage,
 } from "@/hooks/use-public-chatbot";
 import { usePublicConversationStore } from "@/stores/public-chatbot-conversation-store";
+import { useParams } from "next/navigation";
 
 export function PublicChatbot() {
+  const params = useParams();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [input, setInput] = useState("");
   const { mutate, isPending } = useSendPublicChatbotMessage();
   const { messages, resetMessages, addMessage } = usePublicConversationStore();
+
+  const chatbotId = params?.chatbotId as string;
+  const conversationId = params?.conversationId as string;
+
   const { data, isLoading } = usePublicChatbotMessages({
-    chatbotId: "6",
-    conversationId: "aec85fd4-3e19-4f6a-b08e-fc0e1f6aedd5",
+    chatbotId,
+    conversationId,
   });
+
+  // Vérification des paramètres après les hooks
+  if (
+    !chatbotId ||
+    !conversationId ||
+    chatbotId === "undefined" ||
+    conversationId === "undefined"
+  ) {
+    console.log("⚠️ Invalid or missing parameters:", {
+      chatbotId,
+      conversationId,
+    });
+    return (
+      <div className="flex items-center justify-center h-full">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
 
   // Effet pour charger les messages initiaux
   useEffect(() => {
@@ -81,8 +105,8 @@ export function PublicChatbot() {
     mutate(
       {
         message: userMessage,
-        chatbotId: "6",
-        conversationId: "aec85fd4-3e19-4f6a-b08e-fc0e1f6aedd5",
+        chatbotId,
+        conversationId,
       },
       {
         onSuccess: (response) => {
@@ -96,7 +120,7 @@ export function PublicChatbot() {
 
   return (
     <div className="flex flex-col h-[100vh] max-w-[800px] mx-auto">
-      <div className="flex items-center justify-center p-4 border-b border-gray-700">
+      <div className="flex items-center justify-center p-4 border-b md:border-b-0 border-gray-600">
         <h1 className="text-xl font-bold text-white">GUSTAVE</h1>
       </div>
 
@@ -165,7 +189,7 @@ export function PublicChatbot() {
         </div>
       </ScrollArea>
 
-      <div className="sticky bottom-0 border-t border-gray-700 p-4 bg-[#1E1F20]">
+      <div className="sticky bottom-0 border-t md:border-t-0 border-gray-600 p-4 bg-[#1E1F20]">
         <form
           onSubmit={handleSubmit}
           className="flex gap-2 max-w-[800px] mx-auto"
